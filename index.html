@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Scheduler Ultimate v9.1</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        /* --- CORE THEME --- */
+        :root { --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.5); }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: #1f2937; overflow: hidden; 
+        }
+
+        /* --- GLASSMORPHISM UI --- */
+        .glass-panel {
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        .glass-input {
+            background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.1); transition: all 0.2s;
+        }
+        .glass-input:focus {
+            background: white; border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .glass-btn {
+            background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.6); transition: 0.2s;
+        }
+        .glass-btn:hover { background: white; transform: translateY(-1px); }
+
+        /* --- GRID SYSTEM --- */
+        .grid-wrapper {
+            display: grid; 
+            /* Time Column (90px) + 6 Days */
+            grid-template-columns: 90px repeat(6, 1fr); 
+            gap: 1px; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); 
+            border-radius: 12px; overflow: hidden;
+        }
+        .grid-header {
+            background: #1e293b; color: white; padding: 10px; font-size: 0.75rem; 
+            font-weight: 800; text-align: center; text-transform: uppercase; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .grid-cell {
+            background: rgba(255,255,255,0.95); min-height: 100px; padding: 4px; 
+            display: flex; flex-direction: column; position: relative; transition: 0.2s;
+        }
+        .grid-cell:hover { background: #f1f5f9; }
+        .drag-active { background: #e0e7ff !important; box-shadow: inset 0 0 0 2px #4f46e5; }
+
+        /* --- SCROLLBARS --- */
+        .c-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .c-scroll::-webkit-scrollbar-track { background: transparent; }
+        .c-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        .c-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            @page { size: A4 landscape; margin: 5mm; }
+            body { background: white; color: black; -webkit-print-color-adjust: exact; }
+            #app-root { display: none !important; }
+            #print-root { display: block !important; }
+            .print-page { break-after: page; page-break-after: always; height: 100vh; }
+            table { width: 100%; border-collapse: collapse; border: 2px solid black; }
+            th, td { border: 1px solid black; padding: 4px; text-align: center; font-size: 11px; }
+            th { background: #e5e7eb !important; font-weight: bold; }
+            .print-lunch { background: #d1d5db !important; font-weight: bold; }
+        }
+        #print-root { display: none; }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <div id="app-root" class="flex flex-col h-full">
+        
+        <nav class="glass-panel m-3 p-3 rounded-2xl flex justify-between items-center shrink-0 z-50">
+            <div class="flex items-center gap-4 px-2">
+                <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl text-white flex items-center justify-center shadow-lg transform hover:rotate-3 transition">
+                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold leading-none tracking-tight text-gray-900" id="navCollegeName">University Scheduler</h1>
+                    <p class="text-[10px] uppercase font-bold text-indigo-600 tracking-widest mt-0.5">Ultimate Edition v9.1</p>
+                </div>
+            </div>
+
+            <div class="flex bg-gray-100/60 p-1.5 rounded-xl gap-1 backdrop-blur-md">
+                <button onclick="switchView('data')" id="btn-data" class="px-5 py-2.5 rounded-lg text-xs font-bold text-indigo-700 bg-white shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-database"></i> Data Entry
+                </button>
+                <button onclick="switchView('scheduler')" id="btn-scheduler" class="px-5 py-2.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days"></i> Scheduler
+                </button>
+                <button onclick="switchView('faculty')" id="btn-faculty" class="px-5 py-2.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-chalkboard-user"></i> Faculty View
+                </button>
+                <button onclick="switchView('free')" id="btn-free" class="px-5 py-2.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-binoculars"></i> Free Finder
+                </button>
+            </div>
+
+            <div class="flex gap-2 items-center">
+                <button onclick="openConfig()" class="glass-btn w-10 h-10 rounded-xl text-gray-700 hover:text-indigo-600 flex items-center justify-center" title="Settings">
+                    <i class="fa-solid fa-gear text-lg"></i>
+                </button>
+                
+                <div class="h-8 w-px bg-gray-400/30 mx-1"></div>
+
+                <button onclick="backupData()" class="glass-btn w-10 h-10 rounded-xl text-blue-600 hover:text-blue-800 flex items-center justify-center" title="Backup JSON">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <button onclick="document.getElementById('restoreFile').click()" class="glass-btn w-10 h-10 rounded-xl text-blue-600 hover:text-blue-800 flex items-center justify-center" title="Restore JSON">
+                    <i class="fa-solid fa-upload"></i>
+                </button>
+                <input type="file" id="restoreFile" class="hidden" accept=".json" onchange="restoreData(this)">
+
+                <div class="h-8 w-px bg-gray-400/30 mx-1"></div>
+
+                <button onclick="exportExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-excel"></i> Export
+                </button>
+                <button onclick="printAll()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
+                
+                <div class="h-8 w-px bg-gray-400/30 mx-1"></div>
+
+                <button onclick="resetAll()" class="bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2 border border-red-200" title="Factory Reset">
+                    <i class="fa-solid fa-trash-can"></i> Reset
+                </button>
+            </div>
+        </nav>
+
+        <div class="flex-1 overflow-hidden relative p-3 pt-0">
+            
+            <div id="view-data" class="h-full overflow-y-auto c-scroll p-2">
+                <div class="max-w-7xl mx-auto space-y-6">
+                    
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h2 class="font-bold text-xl text-gray-800 flex items-center gap-2">
+                                <i class="fa-solid fa-server text-indigo-500"></i> Master Data Management
+                            </h2>
+                            <p class="text-xs text-gray-500 mt-1">Manage Subjects, Faculty, Rooms, and Batches manually or via Excel.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="dlTemplate()" class="glass-btn px-4 py-2 rounded-xl text-xs font-bold text-gray-700">
+                                <i class="fa-solid fa-file-csv mr-2"></i>Download Template
+                            </button>
+                            <label class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer shadow-lg shadow-indigo-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Import Excel
+                                <input type="file" onchange="importExcel(this)" class="hidden" accept=".csv, .xlsx">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-6 h-[620px]">
+                        <div class="w-full lg:w-1/3 glass-panel p-6 rounded-3xl flex flex-col relative overflow-hidden">
+                            <div class="flex justify-between items-center mb-6 border-b border-gray-200/50 pb-2">
+                                <h3 class="font-bold text-gray-800" id="formTitle">Add New Subject</h3>
+                                <button onclick="resetForm()" id="cancelBtn" class="hidden text-[10px] font-bold bg-red-100 text-red-600 px-2 py-1 rounded uppercase tracking-wide hover:bg-red-200">Cancel</button>
+                            </div>
+                            
+                            <form id="form" onsubmit="saveSubject(event)" class="space-y-4 overflow-y-auto c-scroll flex-1 pr-1">
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Batch Name</label>
+                                    <input id="inBatch" list="dl-batch" class="glass-input w-full p-3 rounded-xl text-sm font-bold uppercase text-gray-800" placeholder="e.g. BCA-V" required>
+                                    <datalist id="dl-batch"></datalist>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Subject Code</label>
+                                        <input id="inCode" class="glass-input w-full p-3 rounded-xl text-sm font-bold uppercase" placeholder="CS-101" required>
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Room No</label>
+                                        <input id="inRoom" class="glass-input w-full p-3 rounded-xl text-sm font-bold" placeholder="Lab-1">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Subject Name</label>
+                                    <input id="inName" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Full Title" required>
+                                </div>
+
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Faculty Name</label>
+                                    <input id="inFac" list="dl-fac" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Select Faculty" required>
+                                    <datalist id="dl-fac"></datalist>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Hours/Week</label>
+                                        <input type="number" id="inHours" class="glass-input w-full p-3 rounded-xl text-sm font-bold" value="3" min="1" max="15">
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Type</label>
+                                        <select id="inType" class="glass-input w-full p-3 rounded-xl text-sm font-medium bg-white/50">
+                                            <option value="Lecture">Lecture</option>
+                                            <option value="Lab">Lab (2 Hrs)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="saveBtn" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/30 transition-all mt-4 text-sm flex justify-center items-center gap-2">
+                                    <i class="fa-solid fa-plus"></i> Save to Database
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="w-full lg:w-2/3 glass-panel p-0 rounded-3xl overflow-hidden flex flex-col">
+                            <div class="p-4 bg-white/40 border-b border-gray-200/50 backdrop-blur-sm flex justify-between items-center">
+                                <h3 class="font-bold text-gray-700 pl-2">Subjects Database</h3>
+                                <div class="relative">
+                                    <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400 text-xs"></i>
+                                    <input id="search" onkeyup="renderDB()" class="glass-input pl-9 pr-4 py-2 rounded-full text-xs w-64 shadow-sm" placeholder="Search batch, subject, faculty...">
+                                </div>
+                            </div>
+                            <div class="flex-1 overflow-auto c-scroll">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="text-xs text-gray-500 uppercase bg-gray-50/50 sticky top-0 backdrop-blur-md z-10">
+                                        <tr>
+                                            <th class="px-6 py-4 font-bold">Batch</th>
+                                            <th class="px-6 py-4 font-bold">Code</th>
+                                            <th class="px-6 py-4 font-bold">Subject</th>
+                                            <th class="px-6 py-4 font-bold">Room</th>
+                                            <th class="px-6 py-4 font-bold">Faculty</th>
+                                            <th class="px-6 py-4 text-right font-bold">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dbTable" class="divide-y divide-gray-100/50 bg-white/30"></tbody>
+                                </table>
+                            </div>
+                            <div class="p-2 bg-gray-50/50 text-center text-xs text-gray-400 border-t border-gray-100 font-medium" id="dbCount">0 Records Found</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-scheduler" class="hidden h-full flex gap-5 p-2 overflow-hidden">
+                <div class="w-80 glass-panel rounded-3xl flex flex-col z-10 shrink-0 shadow-lg">
+                    <div class="p-6 border-b border-gray-200/50 bg-white/30 rounded-t-3xl">
+                        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Working Batch</label>
+                        <select id="selBatch" onchange="loadBatch(this.value)" class="glass-input w-full mt-1 p-3 rounded-xl font-bold text-gray-800 outline-none">
+                            <option value="">Select Batch...</option>
+                        </select>
+                        
+                        <button onclick="autoSchedule()" class="w-full mt-5 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-3 rounded-xl shadow-lg shadow-fuchsia-500/20 text-xs font-bold hover:scale-[1.02] transition-transform flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Schedule Batch
+                        </button>
+                    </div>
+                    
+                    <div class="p-3 px-6 bg-indigo-50/50 border-b border-gray-100 flex justify-between text-xs font-bold text-indigo-900">
+                        <span>Subject Pool</span>
+                        <span id="poolStatus" class="bg-indigo-100 px-2 py-0.5 rounded text-indigo-700">0h Left</span>
+                    </div>
+
+                    <div id="pool" class="flex-1 overflow-y-auto p-4 space-y-3 c-scroll bg-gray-50/20">
+                        </div>
+                </div>
+                
+                <div class="flex-1 overflow-auto c-scroll glass-panel rounded-3xl p-5 shadow-inner bg-white/20">
+                    <div id="grid-main" class="grid-wrapper min-w-[1000px]">
+                        </div>
+                </div>
+            </div>
+
+            <div id="view-faculty" class="hidden h-full flex flex-col p-4 overflow-auto c-scroll">
+                <div class="glass-panel p-5 rounded-2xl mb-8 max-w-5xl mx-auto w-full flex items-center gap-6 shadow-md">
+                    <label class="font-bold text-gray-700 text-lg">Select Faculty:</label>
+                    <select id="selFacView" onchange="loadFacultyView(this.value)" class="glass-input p-2.5 rounded-xl w-72 font-bold text-gray-800 outline-none">
+                        <option value="">Choose Name...</option>
+                    </select>
+                    <div class="ml-auto text-xs text-gray-500 italic bg-white/50 px-3 py-1 rounded-full border border-white">Shows master schedule across all batches</div>
+                </div>
+                <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl">
+                    <div id="grid-fac" class="grid-wrapper"></div>
+                </div>
+            </div>
+
+            <div id="view-free" class="hidden h-full flex flex-col p-4 overflow-auto c-scroll">
+                <div class="glass-panel p-6 rounded-2xl mb-6 max-w-5xl mx-auto w-full text-center shadow-md">
+                    <h2 class="text-2xl font-bold text-indigo-900 mb-2 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-binoculars text-indigo-500"></i> Available Faculty Finder
+                    </h2>
+                    <p class="text-sm text-gray-500">Click on any green time slot below to instantly see a list of teachers who have <b>NO CLASS</b> assigned at that time.</p>
+                </div>
+                <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl">
+                    <div id="grid-free" class="grid-wrapper"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modalConfig" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center">
+        <div class="glass-panel bg-white p-8 rounded-[2rem] shadow-2xl w-[500px] transform scale-100 transition-all">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h3 class="text-2xl font-bold text-gray-800">System Configuration</h3>
+                <button onclick="document.getElementById('modalConfig').classList.add('hidden')" class="w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">College Name</label>
+                        <input id="cfgCollege" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Department</label>
+                        <input id="cfgDept" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
+                    </div>
+                </div>
+
+                <div class="h-px bg-gray-100"></div>
+
+                <h4 class="font-bold text-indigo-600 text-xs uppercase tracking-widest mb-3">Bell Schedule</h4>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Start Time</label>
+                        <input type="time" id="cfgStart" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Lunch Duration (min)</label>
+                        <input type="number" id="cfgLunchDur" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Total Periods</label>
+                        <input type="number" id="cfgCount" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700" min="4" max="12">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Slot Duration (min)</label>
+                        <input type="number" id="cfgSlotDur" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Lunch Break After Period</label>
+                    <select id="cfgLunchAfter" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
+                        <option value="2">After Period 2</option>
+                        <option value="3">After Period 3</option>
+                        <option value="4">After Period 4</option>
+                        <option value="5">After Period 5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <button onclick="document.getElementById('modalConfig').classList.add('hidden')" class="flex-1 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition">Cancel</button>
+                <button onclick="saveConfig()" class="flex-1 py-3 rounded-xl font-bold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalFree" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center">
+        <div class="glass-panel bg-white p-6 rounded-3xl w-[600px] max-h-[80vh] flex flex-col shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                        <i class="fa-solid fa-user-check text-green-500"></i> Available Faculty
+                    </h3>
+                    <p class="text-xs text-gray-500 font-bold uppercase mt-1" id="freeSubtitle">Monday | 09:00 - 10:00</p>
+                </div>
+                <button onclick="document.getElementById('modalFree').classList.add('hidden')" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="freeList" class="flex-1 overflow-y-auto c-scroll grid grid-cols-2 gap-3 p-1">
+                </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-100 text-center">
+                <button onclick="document.getElementById('modalFree').classList.add('hidden')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-xl text-sm font-bold transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="print-root"></div>
+    
+    <div id="toast" class="fixed bottom-8 right-8 glass-panel bg-gray-900/95 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-40 transition-all duration-300 z-[100] border-l-4 border-indigo-500 flex items-center gap-4 max-w-sm">
+        <i id="tIcon" class="fa-solid fa-circle-check text-green-400 text-2xl"></i>
+        <div>
+            <h4 id="tHead" class="font-bold text-sm text-white">Success</h4>
+            <p id="tMsg" class="text-xs text-gray-300 mt-0.5">Operation completed successfully.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        
+        // --- STATE ---
+        let app = {
+            config: { 
+                college: "Jaipur National University", 
+                dept: "School of Engineering & Technology", 
+                start: "09:00", 
+                pCount: 6, 
+                pDur: 60, 
+                lDur: 30, 
+                lAfter: 3 
+            },
+            subjects: [],
+            schedule: [] // {batch, day, pIdx, sid}
+        };
+        let editId = null;
+
+        // --- INIT ---
+        window.onload = () => {
+            const saved = localStorage.getItem('uniSchedProV9');
+            if(saved) app = JSON.parse(saved);
+            
+            refreshUI(); // Applies Config to UI labels
+            refreshSelectors();
+            renderDB();
+            
+            // Initial View
+            if(app.subjects.length > 0) switchView('scheduler');
+            else switchView('data');
+        };
+
+        const save = () => {
+            localStorage.setItem('uniSchedProV9', JSON.stringify(app));
+            refreshUI();
+        };
+
+        const toast = (title, msg, isError = false) => {
+            const el = document.getElementById('toast');
+            document.getElementById('tHead').innerText = title;
+            document.getElementById('tMsg').innerText = msg;
+            document.getElementById('tIcon').className = isError 
+                ? 'fa-solid fa-triangle-exclamation text-red-500 text-2xl' 
+                : 'fa-solid fa-circle-check text-green-400 text-2xl';
+            
+            el.className = `fixed bottom-8 right-8 glass-panel bg-gray-900/95 text-white px-6 py-4 rounded-xl shadow-2xl transform transition-all duration-300 z-[100] border-l-4 flex items-center gap-4 max-w-sm ${isError ? 'border-red-500' : 'border-indigo-500'}`;
+            
+            el.classList.remove('translate-y-40');
+            setTimeout(() => el.classList.add('translate-y-40'), 3500);
+        };
+
+        function refreshUI() {
+            document.getElementById('navCollegeName').innerText = app.config.college;
+        }
+
+        // --- SETTINGS ---
+        function openConfig() {
+            document.getElementById('cfgCollege').value = app.config.college;
+            document.getElementById('cfgDept').value = app.config.dept;
+            document.getElementById('cfgStart').value = app.config.start;
+            document.getElementById('cfgCount').value = app.config.pCount;
+            document.getElementById('cfgSlotDur').value = app.config.pDur;
+            document.getElementById('cfgLunchDur').value = app.config.lDur;
+            document.getElementById('cfgLunchAfter').value = app.config.lAfter;
+            document.getElementById('modalConfig').classList.remove('hidden');
+        }
+
+        function saveConfig() {
+            app.config = {
+                college: document.getElementById('cfgCollege').value,
+                dept: document.getElementById('cfgDept').value,
+                start: document.getElementById('cfgStart').value,
+                pCount: parseInt(document.getElementById('cfgCount').value),
+                pDur: parseInt(document.getElementById('cfgSlotDur').value),
+                lDur: parseInt(document.getElementById('cfgLunchDur').value),
+                lAfter: parseInt(document.getElementById('cfgLunchAfter').value)
+            };
+            save();
+            document.getElementById('modalConfig').classList.add('hidden');
+            
+            // Refresh Scheduler if active
+            const b = document.getElementById('selBatch').value;
+            if(b) loadBatch(b);
+            
+            toast('Configuration Saved', 'Time slots and headers updated.');
+        }
+
+        // --- TIME ENGINE ---
+        function getSlots() {
+            const slots = [];
+            const [h, m] = app.config.start.split(':').map(Number);
+            let cm = h * 60 + m;
+
+            const fmt = (mins) => {
+                let hh = Math.floor(mins / 60);
+                let mm = mins % 60;
+                const ap = hh >= 12 ? 'PM' : 'AM';
+                if(hh > 12) hh -= 12;
+                if(hh === 0) hh = 12;
+                return `${hh}:${mm.toString().padStart(2,'0')} ${ap}`;
+            };
+
+            for(let i=0; i<app.config.pCount; i++) {
+                if(i === app.config.lAfter) {
+                    const s = cm; cm += app.config.lDur;
+                    slots.push({ type: 'lunch', label: `${fmt(s)} - ${fmt(cm)}` });
+                }
+                const s = cm; cm += app.config.pDur;
+                slots.push({ type: 'class', label: `${fmt(s)} - ${fmt(cm)}`, idx: i });
+            }
+            return slots;
+        }
+
+        // --- DATA ENTRY ---
+        function saveSubject(e) {
+            e.preventDefault();
+            const form = {
+                batch: document.getElementById('inBatch').value.toUpperCase().trim(),
+                code: document.getElementById('inCode').value.toUpperCase().trim(),
+                name: document.getElementById('inName').value.trim(),
+                room: document.getElementById('inRoom').value.trim(),
+                fac: document.getElementById('inFac').value.trim(),
+                hrs: parseInt(document.getElementById('inHours').value),
+                type: document.getElementById('inType').value
+            };
+
+            if(editId) {
+                const idx = app.subjects.findIndex(x => x.id === editId);
+                if(idx > -1) app.subjects[idx] = { ...app.subjects[idx], ...form };
+                toast('Updated', 'Subject details modified.');
+                resetForm();
+            } else {
+                if(app.subjects.find(x => x.batch===form.batch && x.code===form.code && x.fac===form.fac)) {
+                    return toast('Duplicate Error', 'This subject already exists.', true);
+                }
+                app.subjects.push({ id: Math.random().toString(36).substr(2), ...form });
+                toast('Saved', 'New subject added to database.');
+            }
+            save(); refreshSelectors(); renderDB();
+        }
+
+        function editSubject(id) {
+            const s = app.subjects.find(x => x.id === id);
+            if(!s) return;
+            document.getElementById('inBatch').value = s.batch;
+            document.getElementById('inCode').value = s.code;
+            document.getElementById('inName').value = s.name;
+            document.getElementById('inRoom').value = s.room || '';
+            document.getElementById('inFac').value = s.fac;
+            document.getElementById('inHours').value = s.hrs;
+            document.getElementById('inType').value = s.type;
+            
+            editId = id;
+            document.getElementById('formTitle').innerText = 'Edit Subject';
+            document.getElementById('saveBtn').innerHTML = 'Update Subject';
+            document.getElementById('cancelBtn').classList.remove('hidden');
+        }
+
+        function resetForm() {
+            document.getElementById('form').reset();
+            editId = null;
+            document.getElementById('formTitle').innerText = 'Add New Subject';
+            document.getElementById('saveBtn').innerHTML = 'Save to Database';
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
+
+        function deleteSubject(id) {
+            if(confirm("Are you sure? This will delete the subject AND remove it from all schedules.")) {
+                app.subjects = app.subjects.filter(s => s.id !== id);
+                app.schedule = app.schedule.filter(s => s.sid !== id);
+                save(); refreshSelectors(); renderDB();
+                const b = document.getElementById('selBatch').value;
+                if(b) loadBatch(b);
+                toast('Deleted', 'Subject removed successfully.');
+            }
+        }
+
+        function renderDB() {
+            const q = document.getElementById('search').value.toLowerCase();
+            const tbody = document.getElementById('dbTable');
+            tbody.innerHTML = app.subjects.filter(s => 
+                !q || s.batch.toLowerCase().includes(q) || s.name.toLowerCase().includes(q) || s.fac.toLowerCase().includes(q)
+            ).map(s => `
+                <tr class="hover:bg-indigo-50/40 group transition-colors">
+                    <td class="px-6 py-4 font-bold text-gray-700">${s.batch}</td>
+                    <td class="px-6 py-4 font-mono text-indigo-600 font-bold">${s.code}</td>
+                    <td class="px-6 py-4 font-medium">${s.name}</td>
+                    <td class="px-6 py-4 font-bold text-xs">${s.room || '-'}</td>
+                    <td class="px-6 py-4 text-xs text-gray-600">${s.fac}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="editSubject('${s.id}')" class="text-indigo-500 hover:text-indigo-700 bg-white p-2 rounded-lg shadow-sm mx-1"><i class="fa-solid fa-pencil"></i></button>
+                        <button onclick="deleteSubject('${s.id}')" class="text-red-400 hover:text-red-600 bg-white p-2 rounded-lg shadow-sm mx-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('dbCount').innerText = `${app.subjects.length} Records Found`;
+        }
+
+        // --- GRID RENDERING ---
+        function renderGrid(domId, entity, mode) {
+            const div = document.getElementById(domId);
+            const slots = getSlots();
+            
+            let html = `<div class="grid-header rounded-tl-lg">Time</div>` + DAYS.map(d => `<div class="grid-header">${d}</div>`).join('');
+            
+            slots.forEach(sl => {
+                if(sl.type === 'lunch') {
+                    html += `<div class="col-span-7 bg-gray-200/50 border-y border-gray-300 h-8 flex items-center justify-center text-gray-600 font-bold text-xs tracking-widest uppercase shadow-inner">LUNCH BREAK (${sl.label})</div>`;
+                } else {
+                    html += `<div class="grid-cell justify-center items-center text-[10px] font-bold text-gray-500 border-r border-gray-200"><span class="text-indigo-600 mb-1">P${sl.idx+1}</span>${sl.label}</div>`;
+                    
+                    DAYS.forEach((_, day) => {
+                        // === FREE FINDER LOGIC ===
+                        if(mode === 'free') {
+                            const allFac = [...new Set(app.subjects.map(s => s.fac))];
+                            const busyFac = new Set(
+                                app.schedule.filter(s => s.day === day && s.pIdx === sl.idx)
+                                    .map(s => app.subjects.find(x => x.id === s.sid)?.fac)
+                                    .filter(Boolean)
+                            );
+                            const freeCount = allFac.length - busyFac.size;
+                            
+                            html += `
+                                <div onclick="showFreeFac(${day}, ${sl.idx}, '${sl.label}')" 
+                                     class="grid-cell justify-center items-center cursor-pointer hover:bg-green-50 transition border border-transparent hover:border-green-200">
+                                    <div class="text-2xl font-bold text-green-600">${freeCount}</div>
+                                    <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Available</div>
+                                </div>
+                            `;
+                        } 
+                        // === STANDARD / FACULTY VIEW LOGIC ===
+                        else {
+                            let alloc;
+                            if(mode === 'batch') {
+                                alloc = app.schedule.find(s => s.batch === entity && s.day === day && s.pIdx === sl.idx);
+                            } else {
+                                alloc = app.schedule.find(s => {
+                                    const sub = app.subjects.find(x => x.id === s.sid);
+                                    return sub && sub.fac === entity && s.day === day && s.pIdx === sl.idx;
+                                });
+                            }
+
+                            if(alloc) {
+                                const sub = app.subjects.find(s => s.id === alloc.sid);
+                                const color = stringColor(sub.name);
+                                html += `
+                                    <div class="grid-cell justify-center text-center p-1 group relative hover:brightness-95 transition" 
+                                         style="background-color: ${color}15; border-left: 3px solid ${color}">
+                                        <div class="font-bold text-xs text-gray-800 leading-tight">${mode==='batch' ? sub.code : sub.batch}</div>
+                                        <div class="text-[10px] leading-tight text-gray-600 my-1 line-clamp-2">${sub.name}</div>
+                                        <div class="text-[9px] font-bold text-gray-400 uppercase tracking-tight">${mode==='batch' ? sub.fac : (sub.room || 'N/A')}</div>
+                                        
+                                        ${mode==='batch' && sub.room ? `<div class="text-[9px] text-indigo-600 font-bold mt-0.5"><i class="fa-solid fa-door-open"></i> ${sub.room}</div>` : ''}
+
+                                        ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx})" class="absolute top-0 right-0 p-1 text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 transition"><i class="fa-solid fa-circle-xmark"></i></button>` : ''}
+                                    </div>
+                                `;
+                            } else {
+                                if(mode === 'batch') {
+                                    html += `<div class="grid-cell hover:bg-indigo-50/50 transition-colors" 
+                                        ondragover="event.preventDefault(); this.classList.add('drag-active')" 
+                                        ondragleave="this.classList.remove('drag-active')" 
+                                        ondrop="handleDrop(event, ${day}, ${sl.idx}, '${entity}')"></div>`;
+                                } else {
+                                    html += `<div class="grid-cell bg-gray-50/20"></div>`;
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            div.innerHTML = html;
+        }
+
+        // --- FREE FACULTY POPUP ---
+        function showFreeFac(d, p, label) {
+            const allFac = [...new Set(app.subjects.map(s => s.fac))].sort();
+            const busyFac = new Set(
+                app.schedule.filter(s => s.day === d && s.pIdx === p)
+                    .map(s => app.subjects.find(x => x.id === s.sid)?.fac)
+                    .filter(Boolean)
+            );
+            const freeList = allFac.filter(f => !busyFac.has(f));
+
+            document.getElementById('freeSubtitle').innerText = `${DAYS[d]} | ${label}`;
+            document.getElementById('freeList').innerHTML = freeList.length > 0 
+                ? freeList.map(f => `
+                    <div class="p-3 bg-green-50 text-green-800 font-bold text-xs rounded-xl border border-green-100 flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> ${f}
+                    </div>
+                `).join('')
+                : `<div class="col-span-2 text-center text-gray-400 italic py-4">All faculty members are busy!</div>`;
+            
+            document.getElementById('modalFree').classList.remove('hidden');
+        }
+
+        // --- SCHEDULING ---
+        function loadBatch(b) {
+            if(!b) return;
+            const pool = document.getElementById('pool');
+            pool.innerHTML = '';
+            
+            const subs = app.subjects.filter(s => s.batch === b);
+            let totalRem = 0;
+
+            subs.forEach(s => {
+                const used = app.schedule.filter(x => x.sid === s.id).length;
+                const rem = s.hrs - used;
+                totalRem += rem;
+
+                if(rem > 0) {
+                    const el = document.createElement('div');
+                    el.className = "glass-panel p-3 rounded-xl cursor-grab active:cursor-grabbing border-l-4 hover:bg-white transition transform hover:translate-x-1";
+                    el.style.borderLeftColor = stringColor(s.name);
+                    el.draggable = true;
+                    el.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <span class="font-bold text-xs text-gray-800">${s.code}</span>
+                            <span class="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full font-bold">${rem}h</span>
+                        </div>
+                        <div class="text-xs font-medium text-gray-700 mt-1 truncate" title="${s.name}">${s.name}</div>
+                        <div class="flex justify-between mt-1 text-[10px] text-gray-500 font-medium">
+                            <span>${s.fac}</span>
+                            <span>${s.room ? '<i class="fa-solid fa-location-dot"></i> '+s.room : ''}</span>
+                        </div>
+                        ${s.type==='Lab' ? '<div class="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full animate-pulse" title="Lab (2 Hrs)"></div>' : ''}
+                    `;
+                    el.ondragstart = e => e.dataTransfer.setData('json', JSON.stringify(s));
+                    pool.appendChild(el);
+                }
+            });
+            document.getElementById('poolStatus').innerHTML = `<span class="bg-indigo-100 px-2 py-0.5 rounded text-indigo-700">${totalRem}h Left</span>`;
+            renderGrid('grid-main', b, 'batch');
+        }
+
+        function handleDrop(e, day, p, b) {
+            e.preventDefault(); e.target.classList.remove('drag-active');
+            const s = JSON.parse(e.dataTransfer.getData('json'));
+
+            if(s.type === 'Lab') {
+                if(p + 1 >= app.config.pCount) return toast('Error', 'Lab requires 2 consecutive slots.', true);
+                if(p === app.config.lAfter) return toast('Error', 'Lab cannot overlap Lunch.', true);
+                
+                if(!isFree(b, day, p, s.fac) || !isFree(b, day, p+1, s.fac)) {
+                    return toast('Conflict', 'Faculty/Batch busy in one of the slots.', true);
+                }
+                app.schedule.push({batch:b, day, pIdx:p, sid:s.id}, {batch:b, day, pIdx:p+1, sid:s.id});
+                toast('Success', 'Lab scheduled (2 hours).');
+            } else {
+                if(!isFree(b, day, p, s.fac)) return toast('Conflict', 'Faculty or Slot is busy.', true);
+                app.schedule.push({batch:b, day, pIdx:p, sid:s.id});
+            }
+            save(); loadBatch(b);
+        }
+
+        function removeAlloc(b, d, p) {
+            const sl = app.schedule.find(s => s.batch === b && s.day === d && s.pIdx === p);
+            if(!sl) return;
+            const sub = app.subjects.find(s => s.id === sl.sid);
+            
+            app.schedule = app.schedule.filter(s => !(s.batch === b && s.day === d && s.pIdx === p));
+            
+            // Smart Lab Remove
+            if(sub && sub.type === 'Lab') {
+                const partner = app.schedule.find(s => s.batch === b && s.day === d && s.sid === sub.id && (s.pIdx === p-1 || s.pIdx === p+1));
+                if(partner) app.schedule = app.schedule.filter(s => s !== partner);
+            }
+            save(); loadBatch(b);
+        }
+
+        function isFree(b, d, p, f) {
+            // Check Batch
+            if(app.schedule.some(s => s.batch === b && s.day === d && s.pIdx === p)) return false;
+            // Check Faculty
+            return !app.schedule.some(s => {
+                if(s.day !== d || s.pIdx !== p) return false;
+                const sb = app.subjects.find(x => x.id === s.sid);
+                return sb && sb.fac === f;
+            });
+        }
+
+        function autoSchedule() {
+            const b = document.getElementById('selBatch').value; if(!b) return;
+            
+            const subs = app.subjects.filter(s => s.batch === b)
+                .map(s => ({...s, rem: s.hrs - app.schedule.filter(x => x.sid === s.id).length}))
+                .filter(s => s.rem > 0)
+                .sort((x, y) => (x.type === 'Lab' ? -1 : 1)); // Labs first
+
+            const slots = [];
+            for(let d=0; d<6; d++) for(let p=0; p<app.config.pCount; p++) slots.push({d, p});
+
+            let assigned = 0;
+
+            subs.forEach(s => {
+                slots.sort(() => Math.random() - 0.5); // Shuffle
+                while(s.rem > 0) {
+                    let placed = false;
+                    
+                    if(s.type === 'Lab' && s.rem >= 2) {
+                        for(let k of slots) {
+                            if(k.p + 1 < app.config.pCount && k.p !== app.config.lAfter && isFree(b, k.d, k.p, s.fac) && isFree(b, k.d, k.p+1, s.fac)) {
+                                app.schedule.push({batch:b, day:k.d, pIdx:k.p, sid:s.id}, {batch:b, day:k.d, pIdx:k.p+1, sid:s.id});
+                                s.rem -= 2; assigned += 2; placed = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        for(let k of slots) {
+                            if(isFree(b, k.d, k.p, s.fac)) {
+                                app.schedule.push({batch:b, day:k.d, pIdx:k.p, sid:s.id});
+                                s.rem--; assigned++; placed = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(!placed) break;
+                }
+            });
+
+            save(); loadBatch(b);
+            toast('Auto-Schedule', `Assigned ${assigned} periods automatically.`);
+        }
+
+        // --- BACKUP & EXPORT ---
+        function backupData() {
+            const blob = new Blob([JSON.stringify(app)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url;
+            a.download = `Scheduler_Backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            toast('Backup Created', 'JSON file downloaded.');
+        }
+
+        function restoreData(i) {
+            const f = i.files[0]; if(!f) return;
+            const r = new FileReader();
+            r.onload = e => {
+                try {
+                    app = JSON.parse(e.target.result);
+                    save(); location.reload();
+                } catch(e) { toast('Error', 'Invalid Backup File', true); }
+            };
+            r.readAsText(f);
+        }
+
+        function resetAll() {
+            if(confirm("⚠️ FACTORY RESET WARNING ⚠️\n\nThis will delete ALL data (Subjects, Schedule, Settings) permanently.\n\nAre you sure you want to start fresh?")) {
+                localStorage.removeItem('uniSchedProV9');
+                location.reload();
+            }
+        }
+
+        // --- EXPORT TO EXCEL ---
+        function exportExcel() {
+            const wb = XLSX.utils.book_new();
+            const batches = [...new Set(app.subjects.map(s => s.batch))].sort();
+            
+            batches.forEach(b => {
+                const wsData = [["Time", ...DAYS]];
+                const slots = getSlots();
+                
+                slots.forEach(sl => {
+                    const r = [sl.label];
+                    if(sl.type === 'lunch') {
+                        wsData.push([`LUNCH (${sl.label})`, "", "", "", "", "", ""]);
+                    } else {
+                        for(let d=0; d<6; d++) {
+                            const alloc = app.schedule.find(s => s.batch === b && s.day === d && s.pIdx === sl.idx);
+                            r.push(alloc ? `${app.subjects.find(z => z.id === alloc.sid).name}\n${app.subjects.find(z => z.id === alloc.sid).fac}` : "");
+                        }
+                        wsData.push(r);
+                    }
+                });
+                
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                ws['!cols'] = [{wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}];
+                XLSX.utils.book_append_sheet(wb, ws, b.substring(0, 30));
+            });
+            XLSX.writeFile(wb, "University_Timetable.xlsx");
+        }
+
+        // --- PRINT ---
+        function printAll() {
+            const div = document.getElementById('print-root');
+            div.innerHTML = '';
+            const batches = [...new Set(app.subjects.map(s => s.batch))].sort();
+            const slots = getSlots();
+
+            batches.forEach(b => {
+                let h = `
+                    <div class="print-page">
+                        <div style="text-align:center; margin-bottom:15px;">
+                            <h1 style="font-size:24px; font-weight:bold; text-transform:uppercase;">${app.config.college}</h1>
+                            <h2 style="font-size:16px; font-weight:bold; color:#555;">${app.config.dept}</h2>
+                            <div style="margin-top:5px; border:2px solid black; display:inline-block; padding:3px 15px; font-weight:bold;">BATCH: ${b}</div>
+                        </div>
+                        <table>
+                            <thead><tr><th>Time</th>${DAYS.map(x => `<th>${x}</th>`).join('')}</tr></thead>
+                            <tbody>
+                `;
+                
+                slots.forEach(sl => {
+                    if(sl.type === 'lunch') {
+                        h += `<tr><td colspan="7" class="print-lunch">LUNCH BREAK (${sl.label})</td></tr>`;
+                    } else {
+                        h += `<tr><td><b>${sl.label}</b></td>`;
+                        for(let d=0; d<6; d++) {
+                            const alloc = app.schedule.find(s => s.batch === b && s.day === d && s.pIdx === sl.idx);
+                            if(alloc) {
+                                const sub = app.subjects.find(z => z.id === alloc.sid);
+                                h += `<td><b>${sub.code}</b><br>${sub.name}<br>[${sub.room||'N/A'}]<br><i>${sub.fac}</i></td>`;
+                            } else {
+                                h += `<td></td>`;
+                            }
+                        }
+                        h += `</tr>`;
+                    }
+                });
+                
+                h += `</tbody></table>
+                    <div style="margin-top:40px; display:flex; justify-content:space-between; font-weight:bold; font-size:12px; padding:0 40px;">
+                        <div style="text-align:center;">____________________<br>Coordinator</div>
+                        <div style="text-align:center;">____________________<br>HOD</div>
+                        <div style="text-align:center;">____________________<br>Principal / Dean</div>
+                    </div>
+                </div>`;
+                div.innerHTML += h;
+            });
+            window.print();
+        }
+
+        // --- UTILS ---
+        function switchView(v) {
+            ['data', 'scheduler', 'faculty', 'free'].forEach(x => {
+                document.getElementById('view-'+x).classList.add('hidden');
+                document.getElementById('btn-'+x).className = "px-4 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2";
+            });
+            document.getElementById('view-'+v).classList.remove('hidden');
+            document.getElementById('btn-'+v).className = "px-4 py-2 rounded-lg text-xs font-bold text-indigo-700 bg-white shadow-sm transition flex items-center gap-2";
+            
+            if(v === 'scheduler') loadBatch(document.getElementById('selBatch').value);
+            if(v === 'faculty') loadFacultyView(document.getElementById('selFacView').value);
+            if(v === 'free') renderGrid('grid-free', null, 'free');
+        }
+
+        function refreshSelectors() {
+            const b = [...new Set(app.subjects.map(s => s.batch))].sort();
+            const f = [...new Set(app.subjects.map(s => s.fac))].sort();
+            
+            const pop = (id, arr) => {
+                const el = document.getElementById(id); const v = el.value;
+                el.innerHTML = '<option value="">Select...</option>' + arr.map(x => `<option value="${x}">${x}</option>`).join('');
+                if(arr.includes(v)) el.value = v;
+            };
+            pop('selBatch', b); pop('selFacView', f);
+            document.getElementById('dl-batch').innerHTML = b.map(x => `<option value="${x}">`).join('');
+            document.getElementById('dl-fac').innerHTML = f.map(x => `<option value="${x}">`).join('');
+        }
+
+        function loadFacultyView(f) { renderGrid('grid-fac', f, 'fac'); }
+        function stringColor(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return ['#ef4444','#f97316','#f59e0b','#84cc16','#10b981','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#d946ef'][Math.abs(h)%10];}
+
+        // --- IMPORT EXCEL ---
+        function importExcel(i) {
+            const f = i.files[0]; if(!f) return;
+            const r = new FileReader();
+            r.onload = e => {
+                const wb = XLSX.read(e.target.result, {type:'array'});
+                const d = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
+                let c = 0;
+                for(let k=1; k<d.length; k++) {
+                    const r = d[k];
+                    if(r[0]) {
+                        app.subjects.push({
+                            id: Math.random().toString(36).substr(2),
+                            code: r[0], name: r[1], fac: r[2], batch: r[3],
+                            hrs: parseInt(r[4]||3), type: r[5]||'Lecture', room: r[6]||''
+                        });
+                        c++;
+                    }
+                }
+                save(); refreshSelectors(); renderDB(); toast('Success', `Imported ${c} records.`);
+            };
+            r.readAsArrayBuffer(f);
+        }
+        function dlTemplate(){ XLSX.writeFile(XLSX.utils.book_new(XLSX.utils.book_append_sheet(XLSX.utils.book_new(),XLSX.utils.aoa_to_sheet([["Code","Subject","Faculty","Batch","Hours","Type","Room"],["CS1","Java","Dr. A","B1",3,"Lecture","101"]]),"Template")),"Template.xlsx"); }
+    </script>
+</body>
+</html>
