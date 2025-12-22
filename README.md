@@ -151,10 +151,7 @@ Got a better idea? A bug fix?
 
 **Star this repo if it saved your semester! ⭐**
 
-Built with ❤️ using **Vanilla JS** & **Tailwind CSS**
+Built with ❤️ using **Vanilla JS** & **Tailwind CSS** By **Jitendra Prajapat**
 
 </div>
 
-```
-
-```
