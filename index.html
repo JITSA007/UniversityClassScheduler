@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University Scheduler Ultimate v9.1</title>
+    <title>University Scheduler Ultimate v9.3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,6 +33,16 @@
             background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.6); transition: 0.2s;
         }
         .glass-btn:hover { background: white; transform: translateY(-1px); }
+
+        /* --- TAB SYSTEM --- */
+        .tab-btn {
+            border-bottom: 2px solid transparent;
+            color: #9ca3af;
+        }
+        .tab-btn.active {
+            border-bottom-color: #6366f1;
+            color: #4f46e5;
+        }
 
         /* --- GRID SYSTEM --- */
         .grid-wrapper {
@@ -86,7 +96,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-extrabold leading-none tracking-tight text-gray-900" id="navCollegeName">University Scheduler</h1>
-                    <p class="text-[10px] uppercase font-bold text-indigo-600 tracking-widest mt-0.5">Ultimate Edition v9.1</p>
+                    <p class="text-[10px] uppercase font-bold text-indigo-600 tracking-widest mt-0.5">Ultimate Edition v9.3</p>
                 </div>
             </div>
 
@@ -162,50 +172,63 @@
 
                     <div class="flex flex-col lg:flex-row gap-6 h-[620px]">
                         <div class="w-full lg:w-1/3 glass-panel p-6 rounded-3xl flex flex-col relative overflow-hidden">
-                            <div class="flex justify-between items-center mb-6 border-b border-gray-200/50 pb-2">
-                                <h3 class="font-bold text-gray-800" id="formTitle">Add New Subject</h3>
+                            
+                            <!-- TABS -->
+                            <div class="flex border-b border-gray-200 mb-4">
+                                <button onclick="setTab('academic')" id="tab-academic" class="tab-btn active flex-1 pb-3 font-bold text-xs uppercase tracking-wide transition">
+                                    <i class="fa-solid fa-book-open mr-1"></i> Academic
+                                </button>
+                                <button onclick="setTab('activity')" id="tab-activity" class="tab-btn flex-1 pb-3 font-bold text-xs uppercase tracking-wide transition">
+                                    <i class="fa-solid fa-person-running mr-1"></i> Activity
+                                </button>
+                            </div>
+
+                            <div class="flex justify-between items-center mb-4 pb-2">
+                                <h3 class="font-bold text-gray-800" id="formTitle">Add Academic Subject</h3>
                                 <button onclick="resetForm()" id="cancelBtn" class="hidden text-[10px] font-bold bg-red-100 text-red-600 px-2 py-1 rounded uppercase tracking-wide hover:bg-red-200">Cancel</button>
                             </div>
                             
                             <form id="form" onsubmit="saveSubject(event)" class="space-y-4 overflow-y-auto c-scroll flex-1 pr-1">
+                                <input type="hidden" id="entryMode" value="academic">
+                                
                                 <div>
                                     <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Batch Name</label>
                                     <input id="inBatch" list="dl-batch" class="glass-input w-full p-3 rounded-xl text-sm font-bold uppercase text-gray-800" placeholder="e.g. BCA-V" required>
                                     <datalist id="dl-batch"></datalist>
                                 </div>
 
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div>
+                                <div class="grid grid-cols-2 gap-3" id="row-code-room">
+                                    <div id="field-code">
                                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Subject Code</label>
-                                        <input id="inCode" class="glass-input w-full p-3 rounded-xl text-sm font-bold uppercase" placeholder="CS-101" required>
+                                        <input id="inCode" class="glass-input w-full p-3 rounded-xl text-sm font-bold uppercase" placeholder="CS-101">
                                     </div>
-                                    <div>
-                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Room No</label>
+                                    <div id="field-room">
+                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Room / Ground</label>
                                         <input id="inRoom" class="glass-input w-full p-3 rounded-xl text-sm font-bold" placeholder="Lab-1">
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Subject Name</label>
+                                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1" id="lbl-name">Subject Name</label>
                                     <input id="inName" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Full Title" required>
                                 </div>
 
                                 <div>
-                                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Faculty Name</label>
-                                    <input id="inFac" list="dl-fac" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Select Faculty" required>
+                                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1" id="lbl-fac">Faculty Name</label>
+                                    <input id="inFac" list="dl-fac" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Select Faculty">
                                     <datalist id="dl-fac"></datalist>
+                                    <p id="hint-fac" class="hidden text-[10px] text-gray-400 mt-1 italic pl-1">* Activity supervisors do not cause schedule clashes.</p>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-3">
-                                    <div>
+                                    <div id="field-hours">
                                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Hours/Week</label>
                                         <input type="number" id="inHours" class="glass-input w-full p-3 rounded-xl text-sm font-bold" value="3" min="1" max="15">
                                     </div>
                                     <div>
                                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Type</label>
                                         <select id="inType" class="glass-input w-full p-3 rounded-xl text-sm font-medium bg-white/50">
-                                            <option value="Lecture">Lecture</option>
-                                            <option value="Lab">Lab (2 Hrs)</option>
+                                            <!-- Options populated by JS based on tab -->
                                         </select>
                                     </div>
                                 </div>
@@ -279,7 +302,9 @@
                     <select id="selFacView" onchange="loadFacultyView(this.value)" class="glass-input p-2.5 rounded-xl w-72 font-bold text-gray-800 outline-none">
                         <option value="">Choose Name...</option>
                     </select>
-                    <div class="ml-auto text-xs text-gray-500 italic bg-white/50 px-3 py-1 rounded-full border border-white">Shows master schedule across all batches</div>
+                    <div class="ml-auto text-xs text-gray-500 italic bg-white/50 px-3 py-1 rounded-full border border-white">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Activity supervisors (Sports, Library) are hidden
+                    </div>
                 </div>
                 <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl">
                     <div id="grid-fac" class="grid-wrapper"></div>
@@ -301,62 +326,35 @@
         </div>
     </div>
 
+    <!-- CONFIG MODAL (Unchanged logic, just keeping structure) -->
     <div id="modalConfig" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center">
         <div class="glass-panel bg-white p-8 rounded-[2rem] shadow-2xl w-[500px] transform scale-100 transition-all">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <h3 class="text-2xl font-bold text-gray-800">System Configuration</h3>
                 <button onclick="document.getElementById('modalConfig').classList.add('hidden')" class="w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            
             <div class="space-y-5">
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">College Name</label>
-                        <input id="cfgCollege" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Department</label>
-                        <input id="cfgDept" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
-                    </div>
+                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">College Name</label><input id="cfgCollege" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700"></div>
+                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Department</label><input id="cfgDept" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700"></div>
                 </div>
-
                 <div class="h-px bg-gray-100"></div>
-
                 <h4 class="font-bold text-indigo-600 text-xs uppercase tracking-widest mb-3">Bell Schedule</h4>
-                
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Start Time</label>
-                        <input type="time" id="cfgStart" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Lunch Duration (min)</label>
-                        <input type="number" id="cfgLunchDur" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
-                    </div>
+                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Start Time</label><input type="time" id="cfgStart" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700"></div>
+                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Lunch Duration (min)</label><input type="number" id="cfgLunchDur" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700"></div>
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Total Periods</label>
-                        <input type="number" id="cfgCount" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700" min="4" max="12">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Slot Duration (min)</label>
-                        <input type="number" id="cfgSlotDur" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
-                    </div>
+                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Total Periods</label><input type="number" id="cfgCount" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700" min="4" max="12"></div>
+                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Slot Duration (min)</label><input type="number" id="cfgSlotDur" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700"></div>
                 </div>
-
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Lunch Break After Period</label>
                     <select id="cfgLunchAfter" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
-                        <option value="2">After Period 2</option>
-                        <option value="3">After Period 3</option>
-                        <option value="4">After Period 4</option>
-                        <option value="5">After Period 5</option>
+                        <option value="2">After Period 2</option><option value="3">After Period 3</option><option value="4">After Period 4</option><option value="5">After Period 5</option>
                     </select>
                 </div>
             </div>
-
             <div class="flex gap-3 mt-8">
                 <button onclick="document.getElementById('modalConfig').classList.add('hidden')" class="flex-1 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition">Cancel</button>
                 <button onclick="saveConfig()" class="flex-1 py-3 rounded-xl font-bold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition">Save Changes</button>
@@ -364,21 +362,14 @@
         </div>
     </div>
 
+    <!-- FREE FACULTY MODAL -->
     <div id="modalFree" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center">
         <div class="glass-panel bg-white p-6 rounded-3xl w-[600px] max-h-[80vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
-                <div>
-                    <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
-                        <i class="fa-solid fa-user-check text-green-500"></i> Available Faculty
-                    </h3>
-                    <p class="text-xs text-gray-500 font-bold uppercase mt-1" id="freeSubtitle">Monday | 09:00 - 10:00</p>
-                </div>
+                <div><h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i class="fa-solid fa-user-check text-green-500"></i> Available Faculty</h3><p class="text-xs text-gray-500 font-bold uppercase mt-1" id="freeSubtitle">Monday | 09:00 - 10:00</p></div>
                 <button onclick="document.getElementById('modalFree').classList.add('hidden')" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <div id="freeList" class="flex-1 overflow-y-auto c-scroll grid grid-cols-2 gap-3 p-1">
-                </div>
-            
+            <div id="freeList" class="flex-1 overflow-y-auto c-scroll grid grid-cols-2 gap-3 p-1"></div>
             <div class="mt-4 pt-4 border-t border-gray-100 text-center">
                 <button onclick="document.getElementById('modalFree').classList.add('hidden')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-xl text-sm font-bold transition">Close</button>
             </div>
@@ -389,29 +380,20 @@
     
     <div id="toast" class="fixed bottom-8 right-8 glass-panel bg-gray-900/95 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-40 transition-all duration-300 z-[100] border-l-4 border-indigo-500 flex items-center gap-4 max-w-sm">
         <i id="tIcon" class="fa-solid fa-circle-check text-green-400 text-2xl"></i>
-        <div>
-            <h4 id="tHead" class="font-bold text-sm text-white">Success</h4>
-            <p id="tMsg" class="text-xs text-gray-300 mt-0.5">Operation completed successfully.</p>
-        </div>
+        <div><h4 id="tHead" class="font-bold text-sm text-white">Success</h4><p id="tMsg" class="text-xs text-gray-300 mt-0.5">Operation completed successfully.</p></div>
     </div>
 
     <script>
         // --- CONSTANTS ---
         const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const ACTIVITY_TYPES = ['Sports', 'Library', 'Research', 'Seminar', 'Activity'];
+        const ACADEMIC_TYPES = ['Lecture', 'Lab'];
         
         // --- STATE ---
         let app = {
-            config: { 
-                college: "Jaipur National University", 
-                dept: "School of Engineering & Technology", 
-                start: "09:00", 
-                pCount: 6, 
-                pDur: 60, 
-                lDur: 30, 
-                lAfter: 3 
-            },
+            config: { college: "Jaipur National University", dept: "School of Engineering & Technology", start: "09:00", pCount: 6, pDur: 60, lDur: 30, lAfter: 3 },
             subjects: [],
-            schedule: [] // {batch, day, pIdx, sid}
+            schedule: []
         };
         let editId = null;
 
@@ -420,36 +402,63 @@
             const saved = localStorage.getItem('uniSchedProV9');
             if(saved) app = JSON.parse(saved);
             
-            refreshUI(); // Applies Config to UI labels
-            refreshSelectors();
-            renderDB();
-            
-            // Initial View
-            if(app.subjects.length > 0) switchView('scheduler');
-            else switchView('data');
+            refreshUI(); refreshSelectors(); renderDB(); setTab('academic');
+            if(app.subjects.length > 0) switchView('scheduler'); else switchView('data');
         };
 
-        const save = () => {
-            localStorage.setItem('uniSchedProV9', JSON.stringify(app));
-            refreshUI();
-        };
+        const save = () => { localStorage.setItem('uniSchedProV9', JSON.stringify(app)); refreshUI(); };
 
         const toast = (title, msg, isError = false) => {
             const el = document.getElementById('toast');
             document.getElementById('tHead').innerText = title;
             document.getElementById('tMsg').innerText = msg;
-            document.getElementById('tIcon').className = isError 
-                ? 'fa-solid fa-triangle-exclamation text-red-500 text-2xl' 
-                : 'fa-solid fa-circle-check text-green-400 text-2xl';
-            
+            document.getElementById('tIcon').className = isError ? 'fa-solid fa-triangle-exclamation text-red-500 text-2xl' : 'fa-solid fa-circle-check text-green-400 text-2xl';
             el.className = `fixed bottom-8 right-8 glass-panel bg-gray-900/95 text-white px-6 py-4 rounded-xl shadow-2xl transform transition-all duration-300 z-[100] border-l-4 flex items-center gap-4 max-w-sm ${isError ? 'border-red-500' : 'border-indigo-500'}`;
-            
             el.classList.remove('translate-y-40');
             setTimeout(() => el.classList.add('translate-y-40'), 3500);
         };
 
-        function refreshUI() {
-            document.getElementById('navCollegeName').innerText = app.config.college;
+        function refreshUI() { document.getElementById('navCollegeName').innerText = app.config.college; }
+
+        // --- TABS & FORM ---
+        function setTab(mode) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + mode).classList.add('active');
+            
+            const typeSel = document.getElementById('inType');
+            typeSel.innerHTML = '';
+            
+            if(mode === 'academic') {
+                document.getElementById('formTitle').innerText = 'Add Academic Subject';
+                document.getElementById('field-code').classList.remove('hidden');
+                document.getElementById('field-hours').classList.remove('hidden');
+                document.getElementById('lbl-name').innerText = 'Subject Name';
+                document.getElementById('lbl-fac').innerText = 'Faculty Name';
+                document.getElementById('hint-fac').classList.add('hidden');
+                document.getElementById('inCode').required = true;
+                
+                ['Lecture', 'Lab (2 Hrs)'].forEach(t => {
+                    let opt = document.createElement('option');
+                    opt.value = t.split(' ')[0]; opt.innerText = t;
+                    typeSel.appendChild(opt);
+                });
+            } else {
+                document.getElementById('formTitle').innerText = 'Add Activity / Event';
+                document.getElementById('field-code').classList.add('hidden'); // Activities don't usually have codes
+                document.getElementById('field-hours').classList.remove('hidden'); // Keep hours
+                document.getElementById('lbl-name').innerText = 'Activity Name';
+                document.getElementById('lbl-fac').innerText = 'Supervisor / Coach (Optional)';
+                document.getElementById('hint-fac').classList.remove('hidden');
+                document.getElementById('inCode').required = false;
+                document.getElementById('inCode').value = '';
+
+                ACTIVITY_TYPES.forEach(t => {
+                    let opt = document.createElement('option');
+                    opt.value = t; opt.innerText = t;
+                    typeSel.appendChild(opt);
+                });
+            }
+            document.getElementById('entryMode').value = mode;
         }
 
         // --- SETTINGS ---
@@ -476,12 +485,8 @@
             };
             save();
             document.getElementById('modalConfig').classList.add('hidden');
-            
-            // Refresh Scheduler if active
-            const b = document.getElementById('selBatch').value;
-            if(b) loadBatch(b);
-            
-            toast('Configuration Saved', 'Time slots and headers updated.');
+            const b = document.getElementById('selBatch').value; if(b) loadBatch(b);
+            toast('Configuration Saved', 'Time slots updated.');
         }
 
         // --- TIME ENGINE ---
@@ -489,23 +494,13 @@
             const slots = [];
             const [h, m] = app.config.start.split(':').map(Number);
             let cm = h * 60 + m;
-
             const fmt = (mins) => {
-                let hh = Math.floor(mins / 60);
-                let mm = mins % 60;
-                const ap = hh >= 12 ? 'PM' : 'AM';
-                if(hh > 12) hh -= 12;
-                if(hh === 0) hh = 12;
-                return `${hh}:${mm.toString().padStart(2,'0')} ${ap}`;
+                let hh = Math.floor(mins / 60); let mm = mins % 60; const ap = hh >= 12 ? 'PM' : 'AM';
+                if(hh > 12) hh -= 12; if(hh === 0) hh = 12; return `${hh}:${mm.toString().padStart(2,'0')} ${ap}`;
             };
-
             for(let i=0; i<app.config.pCount; i++) {
-                if(i === app.config.lAfter) {
-                    const s = cm; cm += app.config.lDur;
-                    slots.push({ type: 'lunch', label: `${fmt(s)} - ${fmt(cm)}` });
-                }
-                const s = cm; cm += app.config.pDur;
-                slots.push({ type: 'class', label: `${fmt(s)} - ${fmt(cm)}`, idx: i });
+                if(i === app.config.lAfter) { const s = cm; cm += app.config.lDur; slots.push({ type: 'lunch', label: `${fmt(s)} - ${fmt(cm)}` }); }
+                const s = cm; cm += app.config.pDur; slots.push({ type: 'class', label: `${fmt(s)} - ${fmt(cm)}`, idx: i });
             }
             return slots;
         }
@@ -513,14 +508,21 @@
         // --- DATA ENTRY ---
         function saveSubject(e) {
             e.preventDefault();
+            const mode = document.getElementById('entryMode').value;
+            const type = document.getElementById('inType').value;
+            
+            // Auto-generate code for activities if missing
+            let code = document.getElementById('inCode').value.toUpperCase().trim();
+            if(mode === 'activity' && !code) code = type.substr(0,3).toUpperCase() + '-' + Math.floor(Math.random()*100);
+
             const form = {
                 batch: document.getElementById('inBatch').value.toUpperCase().trim(),
-                code: document.getElementById('inCode').value.toUpperCase().trim(),
+                code: code,
                 name: document.getElementById('inName').value.trim(),
                 room: document.getElementById('inRoom').value.trim(),
-                fac: document.getElementById('inFac').value.trim(),
+                fac: document.getElementById('inFac').value.trim() || (mode==='activity' ? 'Staff' : 'TBA'),
                 hrs: parseInt(document.getElementById('inHours').value),
-                type: document.getElementById('inType').value
+                type: type
             };
 
             if(editId) {
@@ -533,14 +535,18 @@
                     return toast('Duplicate Error', 'This subject already exists.', true);
                 }
                 app.subjects.push({ id: Math.random().toString(36).substr(2), ...form });
-                toast('Saved', 'New subject added to database.');
+                toast('Saved', mode === 'activity' ? 'New activity added.' : 'New academic subject added.');
             }
             save(); refreshSelectors(); renderDB();
         }
 
         function editSubject(id) {
-            const s = app.subjects.find(x => x.id === id);
-            if(!s) return;
+            const s = app.subjects.find(x => x.id === id); if(!s) return;
+            
+            // Determine mode
+            const isActivity = ACTIVITY_TYPES.includes(s.type);
+            setTab(isActivity ? 'activity' : 'academic');
+
             document.getElementById('inBatch').value = s.batch;
             document.getElementById('inCode').value = s.code;
             document.getElementById('inName').value = s.name;
@@ -550,15 +556,15 @@
             document.getElementById('inType').value = s.type;
             
             editId = id;
-            document.getElementById('formTitle').innerText = 'Edit Subject';
-            document.getElementById('saveBtn').innerHTML = 'Update Subject';
+            document.getElementById('formTitle').innerText = 'Edit ' + (isActivity?'Activity':'Subject');
+            document.getElementById('saveBtn').innerHTML = 'Update Details';
             document.getElementById('cancelBtn').classList.remove('hidden');
         }
 
         function resetForm() {
             document.getElementById('form').reset();
             editId = null;
-            document.getElementById('formTitle').innerText = 'Add New Subject';
+            setTab('academic'); // Reset to default
             document.getElementById('saveBtn').innerHTML = 'Save to Database';
             document.getElementById('cancelBtn').classList.add('hidden');
         }
@@ -568,8 +574,7 @@
                 app.subjects = app.subjects.filter(s => s.id !== id);
                 app.schedule = app.schedule.filter(s => s.sid !== id);
                 save(); refreshSelectors(); renderDB();
-                const b = document.getElementById('selBatch').value;
-                if(b) loadBatch(b);
+                const b = document.getElementById('selBatch').value; if(b) loadBatch(b);
                 toast('Deleted', 'Subject removed successfully.');
             }
         }
@@ -583,7 +588,10 @@
                 <tr class="hover:bg-indigo-50/40 group transition-colors">
                     <td class="px-6 py-4 font-bold text-gray-700">${s.batch}</td>
                     <td class="px-6 py-4 font-mono text-indigo-600 font-bold">${s.code}</td>
-                    <td class="px-6 py-4 font-medium">${s.name}</td>
+                    <td class="px-6 py-4 font-medium">
+                        ${s.name}
+                        ${ACTIVITY_TYPES.includes(s.type) ? '<span class="ml-2 text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded border border-yellow-200">Activity</span>' : ''}
+                    </td>
                     <td class="px-6 py-4 font-bold text-xs">${s.room || '-'}</td>
                     <td class="px-6 py-4 text-xs text-gray-600">${s.fac}</td>
                     <td class="px-6 py-4 text-right">
@@ -611,10 +619,14 @@
                     DAYS.forEach((_, day) => {
                         // === FREE FINDER LOGIC ===
                         if(mode === 'free') {
-                            const allFac = [...new Set(app.subjects.map(s => s.fac))];
+                            const allFac = getAcademicFaculty(); // Only get academic faculty
                             const busyFac = new Set(
                                 app.schedule.filter(s => s.day === day && s.pIdx === sl.idx)
-                                    .map(s => app.subjects.find(x => x.id === s.sid)?.fac)
+                                    .map(s => {
+                                        const sb = app.subjects.find(x => x.id === s.sid);
+                                        // Only count as busy if they are teaching an Academic Subject
+                                        return (sb && ACADEMIC_TYPES.includes(sb.type)) ? sb.fac : null;
+                                    })
                                     .filter(Boolean)
                             );
                             const freeCount = allFac.length - busyFac.size;
@@ -635,12 +647,14 @@
                             } else {
                                 alloc = app.schedule.find(s => {
                                     const sub = app.subjects.find(x => x.id === s.sid);
-                                    return sub && sub.fac === entity && s.day === day && s.pIdx === sl.idx;
+                                    // FILTER: Don't show Activities in Faculty View
+                                    return sub && sub.fac === entity && s.day === day && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
                                 });
                             }
 
                             if(alloc) {
                                 const sub = app.subjects.find(s => s.id === alloc.sid);
+                                const isAct = ACTIVITY_TYPES.includes(sub.type);
                                 const color = stringColor(sub.name);
                                 html += `
                                     <div class="grid-cell justify-center text-center p-1 group relative hover:brightness-95 transition" 
@@ -649,6 +663,7 @@
                                         <div class="text-[10px] leading-tight text-gray-600 my-1 line-clamp-2">${sub.name}</div>
                                         <div class="text-[9px] font-bold text-gray-400 uppercase tracking-tight">${mode==='batch' ? sub.fac : (sub.room || 'N/A')}</div>
                                         
+                                        ${isAct ? '<div class="absolute top-1 right-1 text-yellow-500"><i class="fa-solid fa-star text-[8px]"></i></div>' : ''}
                                         ${mode==='batch' && sub.room ? `<div class="text-[9px] text-indigo-600 font-bold mt-0.5"><i class="fa-solid fa-door-open"></i> ${sub.room}</div>` : ''}
 
                                         ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx})" class="absolute top-0 right-0 p-1 text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 transition"><i class="fa-solid fa-circle-xmark"></i></button>` : ''}
@@ -671,12 +686,25 @@
             div.innerHTML = html;
         }
 
+        // --- HELPER: GET ACADEMIC FACULTY ONLY ---
+        function getAcademicFaculty() {
+            // Find faculty who teach at least one Academic Subject (Lecture/Lab)
+            const academicFac = new Set();
+            app.subjects.forEach(s => {
+                if(ACADEMIC_TYPES.includes(s.type)) academicFac.add(s.fac);
+            });
+            return [...academicFac].sort();
+        }
+
         // --- FREE FACULTY POPUP ---
         function showFreeFac(d, p, label) {
-            const allFac = [...new Set(app.subjects.map(s => s.fac))].sort();
+            const allFac = getAcademicFaculty();
             const busyFac = new Set(
                 app.schedule.filter(s => s.day === d && s.pIdx === p)
-                    .map(s => app.subjects.find(x => x.id === s.sid)?.fac)
+                    .map(s => {
+                        const sb = app.subjects.find(x => x.id === s.sid);
+                        return (sb && ACADEMIC_TYPES.includes(sb.type)) ? sb.fac : null;
+                    })
                     .filter(Boolean)
             );
             const freeList = allFac.filter(f => !busyFac.has(f));
@@ -688,7 +716,7 @@
                         <i class="fa-solid fa-check-circle"></i> ${f}
                     </div>
                 `).join('')
-                : `<div class="col-span-2 text-center text-gray-400 italic py-4">All faculty members are busy!</div>`;
+                : `<div class="col-span-2 text-center text-gray-400 italic py-4">All academic faculty members are busy!</div>`;
             
             document.getElementById('modalFree').classList.remove('hidden');
         }
@@ -723,6 +751,7 @@
                             <span>${s.room ? '<i class="fa-solid fa-location-dot"></i> '+s.room : ''}</span>
                         </div>
                         ${s.type==='Lab' ? '<div class="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full animate-pulse" title="Lab (2 Hrs)"></div>' : ''}
+                        ${ACTIVITY_TYPES.includes(s.type) ? '<div class="absolute bottom-1 right-1 text-[9px] bg-yellow-100 text-yellow-700 px-1 rounded">Activity</div>' : ''}
                     `;
                     el.ondragstart = e => e.dataTransfer.setData('json', JSON.stringify(s));
                     pool.appendChild(el);
@@ -740,13 +769,13 @@
                 if(p + 1 >= app.config.pCount) return toast('Error', 'Lab requires 2 consecutive slots.', true);
                 if(p === app.config.lAfter) return toast('Error', 'Lab cannot overlap Lunch.', true);
                 
-                if(!isFree(b, day, p, s.fac) || !isFree(b, day, p+1, s.fac)) {
+                if(!isFree(b, day, p, s.fac, s.type) || !isFree(b, day, p+1, s.fac, s.type)) {
                     return toast('Conflict', 'Faculty/Batch busy in one of the slots.', true);
                 }
                 app.schedule.push({batch:b, day, pIdx:p, sid:s.id}, {batch:b, day, pIdx:p+1, sid:s.id});
                 toast('Success', 'Lab scheduled (2 hours).');
             } else {
-                if(!isFree(b, day, p, s.fac)) return toast('Conflict', 'Faculty or Slot is busy.', true);
+                if(!isFree(b, day, p, s.fac, s.type)) return toast('Conflict', 'Faculty or Slot is busy.', true);
                 app.schedule.push({batch:b, day, pIdx:p, sid:s.id});
             }
             save(); loadBatch(b);
@@ -758,8 +787,6 @@
             const sub = app.subjects.find(s => s.id === sl.sid);
             
             app.schedule = app.schedule.filter(s => !(s.batch === b && s.day === d && s.pIdx === p));
-            
-            // Smart Lab Remove
             if(sub && sub.type === 'Lab') {
                 const partner = app.schedule.find(s => s.batch === b && s.day === d && s.sid === sub.id && (s.pIdx === p-1 || s.pIdx === p+1));
                 if(partner) app.schedule = app.schedule.filter(s => s !== partner);
@@ -767,103 +794,85 @@
             save(); loadBatch(b);
         }
 
-        function isFree(b, d, p, f) {
-            // Check Batch
+        function isFree(b, d, p, f, type) {
+            // 1. Check Batch (Batch can't be in 2 places, regardless of type)
             if(app.schedule.some(s => s.batch === b && s.day === d && s.pIdx === p)) return false;
-            // Check Faculty
+            
+            // 2. Check Faculty
+            // If the subject we are placing is an ACTIVITY, we ignore faculty clashes (Coach can handle multiple batches)
+            if(ACTIVITY_TYPES.includes(type)) return true;
+
+            // If subject is ACADEMIC, check if faculty is busy
             return !app.schedule.some(s => {
                 if(s.day !== d || s.pIdx !== p) return false;
                 const sb = app.subjects.find(x => x.id === s.sid);
-                return sb && sb.fac === f;
+                // If the faculty is busy with an ACTIVITY, they are NOT considered clashing (can leave activity to staff)
+                // BUT if they are busy with ACADEMIC class, it's a clash.
+                return sb && sb.fac === f && ACADEMIC_TYPES.includes(sb.type);
             });
         }
 
         function autoSchedule() {
             const b = document.getElementById('selBatch').value; if(!b) return;
-            
             const subs = app.subjects.filter(s => s.batch === b)
                 .map(s => ({...s, rem: s.hrs - app.schedule.filter(x => x.sid === s.id).length}))
                 .filter(s => s.rem > 0)
-                .sort((x, y) => (x.type === 'Lab' ? -1 : 1)); // Labs first
+                .sort((x, y) => (x.type === 'Lab' ? -1 : 1)); 
 
             const slots = [];
             for(let d=0; d<6; d++) for(let p=0; p<app.config.pCount; p++) slots.push({d, p});
 
             let assigned = 0;
-
             subs.forEach(s => {
-                slots.sort(() => Math.random() - 0.5); // Shuffle
+                slots.sort(() => Math.random() - 0.5);
                 while(s.rem > 0) {
                     let placed = false;
-                    
                     if(s.type === 'Lab' && s.rem >= 2) {
                         for(let k of slots) {
-                            if(k.p + 1 < app.config.pCount && k.p !== app.config.lAfter && isFree(b, k.d, k.p, s.fac) && isFree(b, k.d, k.p+1, s.fac)) {
+                            if(k.p + 1 < app.config.pCount && k.p !== app.config.lAfter && isFree(b, k.d, k.p, s.fac, s.type) && isFree(b, k.d, k.p+1, s.fac, s.type)) {
                                 app.schedule.push({batch:b, day:k.d, pIdx:k.p, sid:s.id}, {batch:b, day:k.d, pIdx:k.p+1, sid:s.id});
-                                s.rem -= 2; assigned += 2; placed = true;
-                                break;
+                                s.rem -= 2; assigned += 2; placed = true; break;
                             }
                         }
                     } else {
                         for(let k of slots) {
-                            if(isFree(b, k.d, k.p, s.fac)) {
+                            if(isFree(b, k.d, k.p, s.fac, s.type)) {
                                 app.schedule.push({batch:b, day:k.d, pIdx:k.p, sid:s.id});
-                                s.rem--; assigned++; placed = true;
-                                break;
+                                s.rem--; assigned++; placed = true; break;
                             }
                         }
                     }
                     if(!placed) break;
                 }
             });
-
-            save(); loadBatch(b);
-            toast('Auto-Schedule', `Assigned ${assigned} periods automatically.`);
+            save(); loadBatch(b); toast('Auto-Schedule', `Assigned ${assigned} periods automatically.`);
         }
 
         // --- BACKUP & EXPORT ---
         function backupData() {
             const blob = new Blob([JSON.stringify(app)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url;
-            a.download = `Scheduler_Backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = `Scheduler_Backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
             toast('Backup Created', 'JSON file downloaded.');
         }
 
         function restoreData(i) {
             const f = i.files[0]; if(!f) return;
             const r = new FileReader();
-            r.onload = e => {
-                try {
-                    app = JSON.parse(e.target.result);
-                    save(); location.reload();
-                } catch(e) { toast('Error', 'Invalid Backup File', true); }
-            };
+            r.onload = e => { try { app = JSON.parse(e.target.result); save(); location.reload(); } catch(e) { toast('Error', 'Invalid Backup File', true); } };
             r.readAsText(f);
         }
 
-        function resetAll() {
-            if(confirm("⚠️ FACTORY RESET WARNING ⚠️\n\nThis will delete ALL data (Subjects, Schedule, Settings) permanently.\n\nAre you sure you want to start fresh?")) {
-                localStorage.removeItem('uniSchedProV9');
-                location.reload();
-            }
-        }
+        function resetAll() { if(confirm("⚠️ FACTORY RESET WARNING ⚠️\n\nThis will delete ALL data (Subjects, Schedule, Settings).\n\nAre you sure?")) { localStorage.removeItem('uniSchedProV9'); location.reload(); } }
 
-        // --- EXPORT TO EXCEL ---
         function exportExcel() {
             const wb = XLSX.utils.book_new();
             const batches = [...new Set(app.subjects.map(s => s.batch))].sort();
-            
             batches.forEach(b => {
                 const wsData = [["Time", ...DAYS]];
-                const slots = getSlots();
-                
-                slots.forEach(sl => {
+                getSlots().forEach(sl => {
                     const r = [sl.label];
-                    if(sl.type === 'lunch') {
-                        wsData.push([`LUNCH (${sl.label})`, "", "", "", "", "", ""]);
-                    } else {
+                    if(sl.type === 'lunch') { wsData.push([`LUNCH (${sl.label})`, "", "", "", "", "", ""]); } else {
                         for(let d=0; d<6; d++) {
                             const alloc = app.schedule.find(s => s.batch === b && s.day === d && s.pIdx === sl.idx);
                             r.push(alloc ? `${app.subjects.find(z => z.id === alloc.sid).name}\n${app.subjects.find(z => z.id === alloc.sid).fac}` : "");
@@ -871,7 +880,6 @@
                         wsData.push(r);
                     }
                 });
-                
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
                 ws['!cols'] = [{wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}];
                 XLSX.utils.book_append_sheet(wb, ws, b.substring(0, 30));
@@ -879,65 +887,34 @@
             XLSX.writeFile(wb, "University_Timetable.xlsx");
         }
 
-        // --- PRINT ---
         function printAll() {
-            const div = document.getElementById('print-root');
-            div.innerHTML = '';
+            const div = document.getElementById('print-root'); div.innerHTML = '';
             const batches = [...new Set(app.subjects.map(s => s.batch))].sort();
-            const slots = getSlots();
-
             batches.forEach(b => {
-                let h = `
-                    <div class="print-page">
-                        <div style="text-align:center; margin-bottom:15px;">
-                            <h1 style="font-size:24px; font-weight:bold; text-transform:uppercase;">${app.config.college}</h1>
-                            <h2 style="font-size:16px; font-weight:bold; color:#555;">${app.config.dept}</h2>
-                            <div style="margin-top:5px; border:2px solid black; display:inline-block; padding:3px 15px; font-weight:bold;">BATCH: ${b}</div>
-                        </div>
-                        <table>
-                            <thead><tr><th>Time</th>${DAYS.map(x => `<th>${x}</th>`).join('')}</tr></thead>
-                            <tbody>
-                `;
-                
-                slots.forEach(sl => {
-                    if(sl.type === 'lunch') {
-                        h += `<tr><td colspan="7" class="print-lunch">LUNCH BREAK (${sl.label})</td></tr>`;
-                    } else {
+                let h = `<div class="print-page"><div style="text-align:center; margin-bottom:15px;"><h1 style="font-size:24px; font-weight:bold; text-transform:uppercase;">${app.config.college}</h1><h2 style="font-size:16px; font-weight:bold; color:#555;">${app.config.dept}</h2><div style="margin-top:5px; border:2px solid black; display:inline-block; padding:3px 15px; font-weight:bold;">BATCH: ${b}</div></div><table><thead><tr><th>Time</th>${DAYS.map(x => `<th>${x}</th>`).join('')}</tr></thead><tbody>`;
+                getSlots().forEach(sl => {
+                    if(sl.type === 'lunch') { h += `<tr><td colspan="7" class="print-lunch">LUNCH BREAK (${sl.label})</td></tr>`; } else {
                         h += `<tr><td><b>${sl.label}</b></td>`;
                         for(let d=0; d<6; d++) {
                             const alloc = app.schedule.find(s => s.batch === b && s.day === d && s.pIdx === sl.idx);
                             if(alloc) {
                                 const sub = app.subjects.find(z => z.id === alloc.sid);
                                 h += `<td><b>${sub.code}</b><br>${sub.name}<br>[${sub.room||'N/A'}]<br><i>${sub.fac}</i></td>`;
-                            } else {
-                                h += `<td></td>`;
-                            }
+                            } else { h += `<td></td>`; }
                         }
                         h += `</tr>`;
                     }
                 });
-                
-                h += `</tbody></table>
-                    <div style="margin-top:40px; display:flex; justify-content:space-between; font-weight:bold; font-size:12px; padding:0 40px;">
-                        <div style="text-align:center;">____________________<br>Coordinator</div>
-                        <div style="text-align:center;">____________________<br>HOD</div>
-                        <div style="text-align:center;">____________________<br>Principal / Dean</div>
-                    </div>
-                </div>`;
+                h += `</tbody></table><div style="margin-top:40px; display:flex; justify-content:space-between; font-weight:bold; font-size:12px; padding:0 40px;"><div style="text-align:center;">____________________<br>Coordinator</div><div style="text-align:center;">____________________<br>HOD</div><div style="text-align:center;">____________________<br>Principal / Dean</div></div></div>`;
                 div.innerHTML += h;
             });
             window.print();
         }
 
-        // --- UTILS ---
         function switchView(v) {
-            ['data', 'scheduler', 'faculty', 'free'].forEach(x => {
-                document.getElementById('view-'+x).classList.add('hidden');
-                document.getElementById('btn-'+x).className = "px-4 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2";
-            });
+            ['data', 'scheduler', 'faculty', 'free'].forEach(x => { document.getElementById('view-'+x).classList.add('hidden'); document.getElementById('btn-'+x).className = "px-4 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2"; });
             document.getElementById('view-'+v).classList.remove('hidden');
             document.getElementById('btn-'+v).className = "px-4 py-2 rounded-lg text-xs font-bold text-indigo-700 bg-white shadow-sm transition flex items-center gap-2";
-            
             if(v === 'scheduler') loadBatch(document.getElementById('selBatch').value);
             if(v === 'faculty') loadFacultyView(document.getElementById('selFacView').value);
             if(v === 'free') renderGrid('grid-free', null, 'free');
@@ -945,13 +922,8 @@
 
         function refreshSelectors() {
             const b = [...new Set(app.subjects.map(s => s.batch))].sort();
-            const f = [...new Set(app.subjects.map(s => s.fac))].sort();
-            
-            const pop = (id, arr) => {
-                const el = document.getElementById(id); const v = el.value;
-                el.innerHTML = '<option value="">Select...</option>' + arr.map(x => `<option value="${x}">${x}</option>`).join('');
-                if(arr.includes(v)) el.value = v;
-            };
+            const f = getAcademicFaculty(); // Only show academic faculty in view filters
+            const pop = (id, arr) => { const el = document.getElementById(id); const v = el.value; el.innerHTML = '<option value="">Select...</option>' + arr.map(x => `<option value="${x}">${x}</option>`).join(''); if(arr.includes(v)) el.value = v; };
             pop('selBatch', b); pop('selFacView', f);
             document.getElementById('dl-batch').innerHTML = b.map(x => `<option value="${x}">`).join('');
             document.getElementById('dl-fac').innerHTML = f.map(x => `<option value="${x}">`).join('');
@@ -960,7 +932,6 @@
         function loadFacultyView(f) { renderGrid('grid-fac', f, 'fac'); }
         function stringColor(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return ['#ef4444','#f97316','#f59e0b','#84cc16','#10b981','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#d946ef'][Math.abs(h)%10];}
 
-        // --- IMPORT EXCEL ---
         function importExcel(i) {
             const f = i.files[0]; if(!f) return;
             const r = new FileReader();
@@ -975,15 +946,20 @@
                             id: Math.random().toString(36).substr(2),
                             code: r[0], name: r[1], fac: r[2], batch: r[3],
                             hrs: parseInt(r[4]||3), type: r[5]||'Lecture', room: r[6]||''
-                        });
-                        c++;
+                        }); c++;
                     }
                 }
                 save(); refreshSelectors(); renderDB(); toast('Success', `Imported ${c} records.`);
             };
             r.readAsArrayBuffer(f);
         }
-        function dlTemplate(){ XLSX.writeFile(XLSX.utils.book_new(XLSX.utils.book_append_sheet(XLSX.utils.book_new(),XLSX.utils.aoa_to_sheet([["Code","Subject","Faculty","Batch","Hours","Type","Room"],["CS1","Java","Dr. A","B1",3,"Lecture","101"]]),"Template")),"Template.xlsx"); }
+        function dlTemplate(){ 
+            const wb = XLSX.utils.book_new();
+            const ws_data = [["Code", "Subject", "Faculty", "Batch", "Hours", "Type", "Room"], ["CS-101", "Mathematics", "Dr. Smith", "BCA-1", 4, "Lecture", "Room-101"], ["CS-102", "Physics Lab", "Prof. Doe", "BCA-1", 2, "Lab", "Lab-1"], ["ACT-01", "Sports", "Coach Mike", "BCA-1", 1, "Sports", "Ground"], ["LIB-01", "Library", "Mrs. Sarah", "BCA-1", 1, "Library", "Lib-Hall"]];
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, "University_Scheduler_Template.xlsx");
+        }
     </script>
 </body>
 </html>
