@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University Scheduler Ultimate v9.3</title>
+    <title>University Scheduler Ultimate v9.7</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -71,16 +71,82 @@
         .c-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
 
         /* --- PRINT STYLES --- */
+        @page { 
+            size: A4 landscape; 
+            margin: 5mm; 
+        }
+        
         @media print {
-            @page { size: A4 landscape; margin: 5mm; }
-            body { background: white; color: black; -webkit-print-color-adjust: exact; }
-            #app-root { display: none !important; }
-            #print-root { display: block !important; }
-            .print-page { break-after: page; page-break-after: always; height: 100vh; }
-            table { width: 100%; border-collapse: collapse; border: 2px solid black; }
-            th, td { border: 1px solid black; padding: 4px; text-align: center; font-size: 11px; }
-            th { background: #e5e7eb !important; font-weight: bold; }
-            .print-lunch { background: #d1d5db !important; font-weight: bold; }
+            body { 
+                background: white; 
+                color: black; 
+                -webkit-print-color-adjust: exact; 
+                margin: 0; padding: 0;
+            }
+            
+            /* HIDE UI ELEMENTS STRICTLY */
+            #app-root, #toast, .glass-panel, nav, button { display: none !important; }
+            
+            /* SHOW PRINT ROOT */
+            #print-root { 
+                display: block !important; 
+                width: 100%; 
+                position: absolute; 
+                top: 0; 
+                left: 0; 
+            }
+            
+            .print-page { 
+                break-after: page; 
+                page-break-after: always; 
+                height: 95vh;
+                display: flex; 
+                flex-direction: column; 
+                padding: 10px;
+                box-sizing: border-box;
+            }
+            
+            .header-section { text-align: center; margin-bottom: 20px; }
+            .batch-badge { margin-top: 5px; border: 2px solid black; display: inline-block; padding: 3px 15px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
+            
+            table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                border: 2px solid black; 
+                flex: 1; /* Grow to fill page */
+            }
+            
+            th, td { 
+                border: 1px solid black; 
+                padding: 4px; 
+                text-align: center; 
+                font-size: 11px; 
+                vertical-align: middle; 
+            }
+            
+            th { background: #f3f4f6 !important; font-weight: 800; text-transform: uppercase; }
+            
+            .print-lunch-header { background: #e5e7eb !important; width: 40px; font-size: 10px; }
+            
+            /* Vertical Lunch Cell */
+            .print-lunch-cell { 
+                background: #e5e7eb !important; 
+                writing-mode: vertical-rl; 
+                text-orientation: upright; 
+                font-weight: 800; 
+                letter-spacing: 4px;
+                font-size: 14px;
+            }
+            
+            .print-footer { 
+                margin-top: 30px; 
+                display: flex; 
+                justify-content: space-between; 
+                font-weight: bold; 
+                font-size: 12px; 
+                padding: 0 50px; 
+                margin-bottom: 20px;
+            }
         }
         #print-root { display: none; }
     </style>
@@ -96,7 +162,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-extrabold leading-none tracking-tight text-gray-900" id="navCollegeName">University Scheduler</h1>
-                    <p class="text-[10px] uppercase font-bold text-indigo-600 tracking-widest mt-0.5">Ultimate Edition v9.3</p>
+                    <p class="text-[10px] uppercase font-bold text-indigo-600 tracking-widest mt-0.5">Ultimate Edition v9.7</p>
                 </div>
             </div>
 
@@ -279,6 +345,11 @@
                         <button onclick="autoSchedule()" class="w-full mt-5 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-3 rounded-xl shadow-lg shadow-fuchsia-500/20 text-xs font-bold hover:scale-[1.02] transition-transform flex items-center justify-center gap-2">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Schedule Batch
                         </button>
+                        
+                        <!-- NEW RESET BATCH BUTTON -->
+                        <button onclick="resetBatch()" class="w-full mt-3 bg-red-50 text-red-600 border border-red-100 py-3 rounded-xl shadow-sm text-xs font-bold hover:bg-red-100 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-eraser"></i> Reset Batch Schedule
+                        </button>
                     </div>
                     
                     <div class="p-3 px-6 bg-indigo-50/50 border-b border-gray-100 flex justify-between text-xs font-bold text-indigo-900">
@@ -326,7 +397,7 @@
         </div>
     </div>
 
-    <!-- CONFIG MODAL (Unchanged logic, just keeping structure) -->
+    <!-- CONFIG MODAL -->
     <div id="modalConfig" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center">
         <div class="glass-panel bg-white p-8 rounded-[2rem] shadow-2xl w-[500px] transform scale-100 transition-all">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
@@ -389,6 +460,11 @@
         const ACTIVITY_TYPES = ['Sports', 'Library', 'Research', 'Seminar', 'Activity'];
         const ACADEMIC_TYPES = ['Lecture', 'Lab'];
         
+        // --- HELPERS ---
+        function cleanStr(s) {
+            return s ? String(s).replace(/\s+/g, ' ').trim() : '';
+        }
+
         // --- STATE ---
         let app = {
             config: { college: "Jaipur National University", dept: "School of Engineering & Technology", start: "09:00", pCount: 6, pDur: 60, lDur: 30, lAfter: 3 },
@@ -400,7 +476,15 @@
         // --- INIT ---
         window.onload = () => {
             const saved = localStorage.getItem('uniSchedProV9');
-            if(saved) app = JSON.parse(saved);
+            if(saved) {
+                app = JSON.parse(saved);
+                // AUTO REPAIR ON LOAD
+                app.subjects.forEach(s => {
+                    s.fac = cleanStr(s.fac);
+                    s.batch = cleanStr(s.batch);
+                });
+                save();
+            }
             
             refreshUI(); refreshSelectors(); renderDB(); setTab('academic');
             if(app.subjects.length > 0) switchView('scheduler'); else switchView('data');
@@ -512,15 +596,15 @@
             const type = document.getElementById('inType').value;
             
             // Auto-generate code for activities if missing
-            let code = document.getElementById('inCode').value.toUpperCase().trim();
+            let code = cleanStr(document.getElementById('inCode').value.toUpperCase());
             if(mode === 'activity' && !code) code = type.substr(0,3).toUpperCase() + '-' + Math.floor(Math.random()*100);
 
             const form = {
-                batch: document.getElementById('inBatch').value.toUpperCase().trim(),
+                batch: cleanStr(document.getElementById('inBatch').value.toUpperCase()),
                 code: code,
                 name: document.getElementById('inName').value.trim(),
                 room: document.getElementById('inRoom').value.trim(),
-                fac: document.getElementById('inFac').value.trim() || (mode==='activity' ? 'Staff' : 'TBA'),
+                fac: cleanStr(document.getElementById('inFac').value) || (mode==='activity' ? 'Staff' : 'TBA'),
                 hrs: parseInt(document.getElementById('inHours').value),
                 type: type
             };
@@ -603,6 +687,43 @@
             document.getElementById('dbCount').innerText = `${app.subjects.length} Records Found`;
         }
 
+        // --- HELPER: GET ACADEMIC FACULTY ONLY ---
+        function getAcademicFaculty() {
+            // Find faculty who teach at least one Academic Subject (Not an Activity)
+            const academicFac = new Set();
+            app.subjects.forEach(s => {
+                // If it is NOT an activity (Sports, Library, etc.), we consider it Academic
+                if(!ACTIVITY_TYPES.includes(s.type)) academicFac.add(cleanStr(s.fac));
+            });
+            return [...academicFac].sort();
+        }
+
+        // --- FREE FACULTY POPUP ---
+        function showFreeFac(d, p, label) {
+            const allFac = getAcademicFaculty();
+            const busyFac = new Set(
+                app.schedule.filter(s => s.day === d && s.pIdx === p)
+                    .map(s => {
+                        const sb = app.subjects.find(x => x.id === s.sid);
+                        // Busy if subject exists AND it is NOT an activity
+                        return (sb && !ACTIVITY_TYPES.includes(sb.type)) ? cleanStr(sb.fac) : null;
+                    })
+                    .filter(Boolean)
+            );
+            const freeList = allFac.filter(f => !busyFac.has(f));
+
+            document.getElementById('freeSubtitle').innerText = `${DAYS[d]} | ${label}`;
+            document.getElementById('freeList').innerHTML = freeList.length > 0 
+                ? freeList.map(f => `
+                    <div class="p-3 bg-green-50 text-green-800 font-bold text-xs rounded-xl border border-green-100 flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> ${f}
+                    </div>
+                `).join('')
+                : `<div class="col-span-2 text-center text-gray-400 italic py-4">All academic faculty members are busy!</div>`;
+            
+            document.getElementById('modalFree').classList.remove('hidden');
+        }
+
         // --- GRID RENDERING ---
         function renderGrid(domId, entity, mode) {
             const div = document.getElementById(domId);
@@ -619,13 +740,13 @@
                     DAYS.forEach((_, day) => {
                         // === FREE FINDER LOGIC ===
                         if(mode === 'free') {
-                            const allFac = getAcademicFaculty(); // Only get academic faculty
+                            const allFac = getAcademicFaculty(); 
                             const busyFac = new Set(
                                 app.schedule.filter(s => s.day === day && s.pIdx === sl.idx)
                                     .map(s => {
                                         const sb = app.subjects.find(x => x.id === s.sid);
-                                        // Only count as busy if they are teaching an Academic Subject
-                                        return (sb && ACADEMIC_TYPES.includes(sb.type)) ? sb.fac : null;
+                                        // Count as busy if teaching ANY academic subject (not activity)
+                                        return (sb && !ACTIVITY_TYPES.includes(sb.type)) ? cleanStr(sb.fac) : null;
                                     })
                                     .filter(Boolean)
                             );
@@ -648,7 +769,7 @@
                                 alloc = app.schedule.find(s => {
                                     const sub = app.subjects.find(x => x.id === s.sid);
                                     // FILTER: Don't show Activities in Faculty View
-                                    return sub && sub.fac === entity && s.day === day && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
+                                    return sub && cleanStr(sub.fac) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
                                 });
                             }
 
@@ -684,41 +805,6 @@
                 }
             });
             div.innerHTML = html;
-        }
-
-        // --- HELPER: GET ACADEMIC FACULTY ONLY ---
-        function getAcademicFaculty() {
-            // Find faculty who teach at least one Academic Subject (Lecture/Lab)
-            const academicFac = new Set();
-            app.subjects.forEach(s => {
-                if(ACADEMIC_TYPES.includes(s.type)) academicFac.add(s.fac);
-            });
-            return [...academicFac].sort();
-        }
-
-        // --- FREE FACULTY POPUP ---
-        function showFreeFac(d, p, label) {
-            const allFac = getAcademicFaculty();
-            const busyFac = new Set(
-                app.schedule.filter(s => s.day === d && s.pIdx === p)
-                    .map(s => {
-                        const sb = app.subjects.find(x => x.id === s.sid);
-                        return (sb && ACADEMIC_TYPES.includes(sb.type)) ? sb.fac : null;
-                    })
-                    .filter(Boolean)
-            );
-            const freeList = allFac.filter(f => !busyFac.has(f));
-
-            document.getElementById('freeSubtitle').innerText = `${DAYS[d]} | ${label}`;
-            document.getElementById('freeList').innerHTML = freeList.length > 0 
-                ? freeList.map(f => `
-                    <div class="p-3 bg-green-50 text-green-800 font-bold text-xs rounded-xl border border-green-100 flex items-center gap-2">
-                        <i class="fa-solid fa-check-circle"></i> ${f}
-                    </div>
-                `).join('')
-                : `<div class="col-span-2 text-center text-gray-400 italic py-4">All academic faculty members are busy!</div>`;
-            
-            document.getElementById('modalFree').classList.remove('hidden');
         }
 
         // --- SCHEDULING ---
@@ -806,9 +892,9 @@
             return !app.schedule.some(s => {
                 if(s.day !== d || s.pIdx !== p) return false;
                 const sb = app.subjects.find(x => x.id === s.sid);
-                // If the faculty is busy with an ACTIVITY, they are NOT considered clashing (can leave activity to staff)
-                // BUT if they are busy with ACADEMIC class, it's a clash.
-                return sb && sb.fac === f && ACADEMIC_TYPES.includes(sb.type);
+                // Clash if faculty is teaching ANY subject that is NOT an activity
+                // AND name matches (using cleaned strings)
+                return sb && cleanStr(sb.fac) === cleanStr(f) && !ACTIVITY_TYPES.includes(sb.type);
             });
         }
 
@@ -848,6 +934,18 @@
             save(); loadBatch(b); toast('Auto-Schedule', `Assigned ${assigned} periods automatically.`);
         }
 
+        function resetBatch() {
+            const b = document.getElementById('selBatch').value;
+            if(!b) return toast('Error', 'Select a batch first.', true);
+            
+            if(confirm(`Are you sure you want to CLEAR the schedule for ${b}?\n\nThis will remove all classes assigned to ${b}.\nThis cannot be undone.`)) {
+                app.schedule = app.schedule.filter(s => s.batch !== b);
+                save();
+                loadBatch(b);
+                toast('Batch Reset', `Schedule for ${b} has been cleared.`);
+            }
+        }
+
         // --- BACKUP & EXPORT ---
         function backupData() {
             const blob = new Blob([JSON.stringify(app)], {type: 'application/json'});
@@ -868,44 +966,172 @@
         function exportExcel() {
             const wb = XLSX.utils.book_new();
             const batches = [...new Set(app.subjects.map(s => s.batch))].sort();
+            
+            // Roman Numerals for Header
+            const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+
             batches.forEach(b => {
-                const wsData = [["Time", ...DAYS]];
-                getSlots().forEach(sl => {
-                    const r = [sl.label];
-                    if(sl.type === 'lunch') { wsData.push([`LUNCH (${sl.label})`, "", "", "", "", "", ""]); } else {
-                        for(let d=0; d<6; d++) {
-                            const alloc = app.schedule.find(s => s.batch === b && s.day === d && s.pIdx === sl.idx);
-                            r.push(alloc ? `${app.subjects.find(z => z.id === alloc.sid).name}\n${app.subjects.find(z => z.id === alloc.sid).fac}` : "");
-                        }
-                        wsData.push(r);
+                // 1. Build Headers matching the CSV format
+                // Row 1: Title Info
+                const titleRow = [`${app.config.college}\n${app.config.dept}\nBatch: ${b}`];
+                
+                // Row 2: Static Headers
+                const headerRow2 = ["DAY", "PERIOD"];
+                
+                // Row 3 & 4: Dynamic Time & Period Headers
+                const headerRow3 = [""]; // Start with one empty slot for DAY column
+                const headerRow4 = [""]; 
+                
+                const slots = getSlots();
+                
+                slots.forEach((sl, index) => {
+                    if (sl.type === 'lunch') {
+                        headerRow3.push(sl.label); // Lunch Time in Row 3
+                        headerRow4.push("");       // Empty in Row 4
+                    } else {
+                        // Find which academic period this is (0, 1, 2...) to map to Roman Numeral
+                        // We rely on sl.idx provided by getSlots()
+                        headerRow3.push(ROMAN[sl.idx] || `P${sl.idx+1}`);
+                        headerRow4.push(sl.label); // Class Time in Row 4
                     }
                 });
+
+                // 2. Build Data Rows (Days)
+                const wsData = [
+                    titleRow,
+                    headerRow2,
+                    headerRow3,
+                    headerRow4
+                ];
+
+                DAYS.forEach((dayName, dIndex) => {
+                    const row = [dayName]; 
+                    
+                    slots.forEach(sl => {
+                        if (sl.type === 'lunch') {
+                            row.push("L      U       N      C      H");
+                        } else {
+                            // Find allocation for this Batch, Day, and Period Index
+                            const alloc = app.schedule.find(s => s.batch === b && s.day === dIndex && s.pIdx === sl.idx);
+                            
+                            if (alloc) {
+                                const sub = app.subjects.find(z => z.id === alloc.sid);
+                                if (sub) {
+                                    // Format: Subject \n (Code) \n (Faculty)
+                                    let cellText = `${sub.name}\n(${sub.code})\n(${sub.fac})`;
+                                    if(sub.room) cellText += `\nRoom: ${sub.room}`;
+                                    row.push(cellText);
+                                } else {
+                                    // Instead of showing error, show empty string
+                                    row.push("");
+                                }
+                            } else {
+                                row.push("");
+                            }
+                        }
+                    });
+                    wsData.push(row);
+                });
+                
+                // 3. Create Sheet
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
-                ws['!cols'] = [{wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:20}];
+                
+                // 4. Styling Hints (Column Widths)
+                // Day Col: 15, Period Col: 5, Others: 25
+                const colWidths = [{wch:15}];
+                slots.forEach(() => colWidths.push({wch:30}));
+                ws['!cols'] = colWidths;
+
+                // 5. Merge Title Row (optional, spans all columns)
+                ws['!merges'] = [
+                    { s: { r: 0, c: 0 }, e: { r: 0, c: slots.length } } 
+                ];
+
                 XLSX.utils.book_append_sheet(wb, ws, b.substring(0, 30));
             });
-            XLSX.writeFile(wb, "University_Timetable.xlsx");
+            
+            XLSX.writeFile(wb, "University_Timetable_Official.xlsx");
         }
 
+        // --- REWRITTEN PRINT FUNCTION ---
         function printAll() {
-            const div = document.getElementById('print-root'); div.innerHTML = '';
+            const div = document.getElementById('print-root');
+            div.innerHTML = '';
             const batches = [...new Set(app.subjects.map(s => s.batch))].sort();
+            const slots = getSlots();
+            const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+
             batches.forEach(b => {
-                let h = `<div class="print-page"><div style="text-align:center; margin-bottom:15px;"><h1 style="font-size:24px; font-weight:bold; text-transform:uppercase;">${app.config.college}</h1><h2 style="font-size:16px; font-weight:bold; color:#555;">${app.config.dept}</h2><div style="margin-top:5px; border:2px solid black; display:inline-block; padding:3px 15px; font-weight:bold;">BATCH: ${b}</div></div><table><thead><tr><th>Time</th>${DAYS.map(x => `<th>${x}</th>`).join('')}</tr></thead><tbody>`;
-                getSlots().forEach(sl => {
-                    if(sl.type === 'lunch') { h += `<tr><td colspan="7" class="print-lunch">LUNCH BREAK (${sl.label})</td></tr>`; } else {
-                        h += `<tr><td><b>${sl.label}</b></td>`;
-                        for(let d=0; d<6; d++) {
-                            const alloc = app.schedule.find(s => s.batch === b && s.day === d && s.pIdx === sl.idx);
-                            if(alloc) {
-                                const sub = app.subjects.find(z => z.id === alloc.sid);
-                                h += `<td><b>${sub.code}</b><br>${sub.name}<br>[${sub.room||'N/A'}]<br><i>${sub.fac}</i></td>`;
-                            } else { h += `<td></td>`; }
-                        }
-                        h += `</tr>`;
+                // Find lunch index
+                const lunchIndex = slots.findIndex(s => s.type === 'lunch');
+                
+                let h = `
+                    <div class="print-page">
+                        <div class="header-section">
+                            <h1 style="font-size:24px; font-weight:bold; text-transform:uppercase;">${app.config.college}</h1>
+                            <h2 style="font-size:16px; font-weight:bold; color:#555;">${app.config.dept}</h2>
+                            <div class="batch-badge">BATCH: ${b}</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">DAY</th>
+                `;
+
+                // Header Row: Periods
+                slots.forEach(sl => {
+                    if (sl.type === 'lunch') {
+                        h += `<th class="print-lunch-header">LUNCH<br>${sl.label}</th>`;
+                    } else {
+                        // Use Roman Numeral based on index
+                        const roman = ROMAN[sl.idx] || (sl.idx + 1);
+                        h += `<th>${roman}<br><span style="font-size:9px; font-weight:normal;">${sl.label}</span></th>`;
                     }
                 });
-                h += `</tbody></table><div style="margin-top:40px; display:flex; justify-content:space-between; font-weight:bold; font-size:12px; padding:0 40px;"><div style="text-align:center;">____________________<br>Coordinator</div><div style="text-align:center;">____________________<br>HOD</div><div style="text-align:center;">____________________<br>Principal / Dean</div></div></div>`;
+
+                h += `</tr></thead><tbody>`;
+
+                // Data Rows: Days
+                DAYS.forEach((dName, dIdx) => {
+                    h += `<tr><td style="font-weight:bold;">${dName}</td>`;
+                    
+                    slots.forEach((sl, sIndex) => {
+                        if (sl.type === 'lunch') {
+                            // Only add the lunch cell for the first day (Monday), spanning all rows
+                            if (dIdx === 0) {
+                                h += `<td rowspan="${DAYS.length}" class="print-lunch-cell">LUNCH BREAK</td>`;
+                            }
+                            // For other days, do nothing as rowspan covers it
+                        } else {
+                            const alloc = app.schedule.find(s => s.batch === b && s.day === dIdx && s.pIdx === sl.idx);
+                            if (alloc) {
+                                const sub = app.subjects.find(z => z.id === alloc.sid);
+                                if (sub) {
+                                    const isAct = ACTIVITY_TYPES.includes(sub.type);
+                                    h += `<td>
+                                        <div style="font-weight:bold; color:#000;">${sub.name}</div>
+                                        <div style="font-size:10px;">${sub.code}</div>
+                                        ${sub.room ? `<div style="font-size:10px; font-weight:bold;">[${sub.room}]</div>` : ''}
+                                        <div style="font-style:italic; font-size:10px; margin-top:2px;">${sub.fac}</div>
+                                    </td>`;
+                                } else {
+                                    h += `<td></td>`;
+                                }
+                            } else {
+                                h += `<td></td>`;
+                            }
+                        }
+                    });
+                    h += `</tr>`;
+                });
+
+                h += `</tbody></table>
+                    <div class="print-footer">
+                        <div>____________________<br>Coordinator</div>
+                        <div>____________________<br>HOD</div>
+                        <div>____________________<br>Director</div>
+                    </div>
+                </div>`;
                 div.innerHTML += h;
             });
             window.print();
@@ -944,7 +1170,7 @@
                     if(r[0]) {
                         app.subjects.push({
                             id: Math.random().toString(36).substr(2),
-                            code: r[0], name: r[1], fac: r[2], batch: r[3],
+                            code: cleanStr(r[0]), name: r[1], fac: cleanStr(r[2]), batch: cleanStr(r[3]),
                             hrs: parseInt(r[4]||3), type: r[5]||'Lecture', room: r[6]||''
                         }); c++;
                     }
