@@ -767,7 +767,7 @@
 
             if(s.type === 'Lab') {
                 if(p + 1 >= app.config.pCount) return toast('Error', 'Lab requires 2 consecutive slots.', true);
-                if(p === app.config.lAfter) return toast('Error', 'Lab cannot overlap Lunch.', true);
+                if(p === app.config.lAfter - 1) return toast('Error', 'Lab cannot overlap Lunch.', true);
                 
                 if(!isFree(b, day, p, s.fac, s.type) || !isFree(b, day, p+1, s.fac, s.type)) {
                     return toast('Conflict', 'Faculty/Batch busy in one of the slots.', true);
@@ -829,7 +829,7 @@
                     let placed = false;
                     if(s.type === 'Lab' && s.rem >= 2) {
                         for(let k of slots) {
-                            if(k.p + 1 < app.config.pCount && k.p !== app.config.lAfter && isFree(b, k.d, k.p, s.fac, s.type) && isFree(b, k.d, k.p+1, s.fac, s.type)) {
+                            if(k.p + 1 < app.config.pCount && k.p !== app.config.lAfter - 1 && isFree(b, k.d, k.p, s.fac, s.type) && isFree(b, k.d, k.p+1, s.fac, s.type)) {
                                 app.schedule.push({batch:b, day:k.d, pIdx:k.p, sid:s.id}, {batch:b, day:k.d, pIdx:k.p+1, sid:s.id});
                                 s.rem -= 2; assigned += 2; placed = true; break;
                             }
