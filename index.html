@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic University Scheduler v11.0</title>
+    <title>Dynamic University Scheduler v12.0</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <!-- Swapped screenshot tool for True Vector PDF tool -->
+    <!-- True Vector PDF Tools -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     
@@ -119,14 +119,24 @@
                         <input type="time" id="suStart" class="glass-input w-full p-3 rounded-xl font-bold text-gray-800" value="09:00" required>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">College Ends At</label>
-                        <input type="time" id="suEnd" class="glass-input w-full p-3 rounded-xl font-bold text-gray-800" value="16:00" required>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Total Periods / Day</label>
+                        <input type="number" id="suPCount" class="glass-input w-full p-3 rounded-xl font-bold text-gray-800" value="6" min="1" max="15" onchange="renderSetupPeriods()" required>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100">
+                    <label class="block text-xs font-bold text-indigo-700 uppercase mb-3 ml-1"><i class="fa-solid fa-clock"></i> Custom Period Durations</label>
+                    <div id="suPeriodGrid" class="grid grid-cols-3 gap-3">
+                        <!-- Populated dynamically by JS -->
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Duration of One Class (Minutes)</label>
-                    <input type="number" id="suDur" class="glass-input w-full p-3 rounded-xl font-bold text-gray-800" value="60" min="15" max="180" required>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Global Lab Duration</label>
+                    <select id="suLabSlots" class="glass-input w-full p-3 rounded-xl font-bold text-gray-800 border-indigo-300">
+                        <option value="2">2 Consecutive Slots (e.g., 2 Hours)</option>
+                        <option value="1">1 Single Slot (e.g., 1 Hour)</option>
+                    </select>
                 </div>
 
                 <div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
@@ -231,7 +241,7 @@
                             <h2 class="font-bold text-xl text-gray-800 flex items-center gap-2">
                                 <i class="fa-solid fa-server text-indigo-500"></i> Master Data Management
                             </h2>
-                            <p class="text-xs text-gray-500 mt-1">Manage Subjects, Faculty, Rooms, and Batches manually or via Excel.</p>
+                            <p class="text-xs text-gray-500 mt-1">Manage Subjects, Specializations, Rooms, and Faculty.</p>
                         </div>
                         <div class="flex gap-3">
                             <button onclick="dlTemplate()" class="glass-btn px-4 py-2 rounded-xl text-xs font-bold text-gray-700">
@@ -261,16 +271,27 @@
                             <form id="form" onsubmit="saveSubject(event)" class="space-y-4 overflow-y-auto c-scroll flex-1 pr-1">
                                 <input type="hidden" id="entryMode" value="academic">
                                 <div><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Batch Name</label><input id="inBatch" list="dl-batch" class="glass-input w-full p-3 rounded-xl text-sm font-bold uppercase" placeholder="e.g. BCA-V" required><datalist id="dl-batch"></datalist></div>
+                                
                                 <div class="grid grid-cols-2 gap-3" id="row-code-room">
                                     <div id="field-code"><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Code</label><input id="inCode" class="glass-input w-full p-3 rounded-xl text-sm font-bold uppercase" placeholder="CS-101"></div>
-                                    <div id="field-room"><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Room / Ground</label><input id="inRoom" class="glass-input w-full p-3 rounded-xl text-sm font-bold" placeholder="Lab-1"></div>
+                                    <div id="field-room"><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Room / Ground</label><input id="inRoom" list="dl-room" class="glass-input w-full p-3 rounded-xl text-sm font-bold" placeholder="Lab-1"><datalist id="dl-room"></datalist></div>
                                 </div>
+                                
+                                <div id="field-spec">
+                                    <label class="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1"><i class="fa-solid fa-code-branch"></i> Specialization (Elective)</label>
+                                    <input id="inSpec" list="dl-spec" class="glass-input border-indigo-200 bg-indigo-50/30 w-full p-3 rounded-xl text-sm font-bold" placeholder="e.g. AIML, Cyber (Leave empty for Core)">
+                                    <datalist id="dl-spec"></datalist>
+                                    <p class="text-[9px] text-gray-400 mt-1 pl-1">Different specializations can run concurrently in the same batch slot.</p>
+                                </div>
+
                                 <div><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1" id="lbl-name">Subject Name</label><input id="inName" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Full Title" required></div>
                                 <div><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1" id="lbl-fac">Faculty Name</label><input id="inFac" list="dl-fac" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Select Faculty"><datalist id="dl-fac"></datalist><p id="hint-fac" class="hidden text-[10px] text-gray-400 mt-1 italic pl-1">* Activities do not cause faculty clashes.</p></div>
+                                
                                 <div class="grid grid-cols-2 gap-3">
                                     <div id="field-hours"><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Hours/Week</label><input type="number" id="inHours" class="glass-input w-full p-3 rounded-xl text-sm font-bold" value="3" min="1"></div>
                                     <div><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Type</label><select id="inType" class="glass-input w-full p-3 rounded-xl text-sm font-medium"></select></div>
                                 </div>
+                                
                                 <button type="submit" id="saveBtn" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-lg mt-4 flex justify-center items-center gap-2"><i class="fa-solid fa-plus"></i> Save</button>
                             </form>
                         </div>
@@ -341,7 +362,7 @@
 
     <!-- SETTINGS MODAL -->
     <div id="modalConfig" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center">
-        <div class="glass-panel bg-white p-8 rounded-[2rem] shadow-2xl w-[500px] transform scale-100 transition-all">
+        <div class="glass-panel bg-white p-8 rounded-[2rem] shadow-2xl w-[500px] transform scale-100 transition-all max-h-[90vh] overflow-y-auto c-scroll">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <h3 class="text-2xl font-bold text-gray-800">System Config</h3>
                 <button onclick="document.getElementById('modalConfig').classList.add('hidden')" class="w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -353,9 +374,23 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Start Time</label><input type="time" id="cfgStart" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700"></div>
-                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">End Time</label><input type="time" id="cfgEnd" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700"></div>
+                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Total Periods</label><input type="number" id="cfgPCount" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700" min="1" max="15" onchange="renderConfigPeriods()"></div>
                 </div>
-                <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Slot Duration (min)</label><input type="number" id="cfgSlotDur" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700"></div>
+                
+                <div class="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Period Durations (mins)</label>
+                    <div id="cfgPeriodGrid" class="grid grid-cols-4 gap-2"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Global Lab Slots</label>
+                        <select id="cfgLabSlots" class="glass-input w-full p-2.5 rounded-xl font-bold text-gray-700">
+                            <option value="2">2 Consecutive Slots</option>
+                            <option value="1">1 Single Slot</option>
+                        </select>
+                    </div>
+                </div>
                 
                 <label class="flex items-center gap-3 cursor-pointer mt-4 border-t pt-4">
                     <input type="checkbox" id="cfgHasLunch" class="w-5 h-5 text-indigo-600 rounded" onchange="document.getElementById('cfgLunchOptions').style.opacity = this.checked ? '1' : '0.5'; document.getElementById('cfgLunchOptions').style.pointerEvents = this.checked ? 'auto' : 'none';">
@@ -370,7 +405,6 @@
                     </div>
                 </div>
 
-                <!-- ADDED SIGNATURE CONFIGURATION -->
                 <div class="border-t pt-4 mt-2">
                     <h4 class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-3 ml-1"><i class="fa-solid fa-pen-nib"></i> Print Signatures</h4>
                     <div class="grid grid-cols-2 gap-2 mb-2">
@@ -430,26 +464,83 @@
         let editId = null;
 
         window.onload = () => {
-            const saved = localStorage.getItem('uniSchedDynV11');
+            const saved = localStorage.getItem('uniSchedDynV12');
             if(saved) {
                 app = JSON.parse(saved);
+                
+                // MIGRATION: Convert old generic duration to the new array system smoothly
+                if (typeof app.config.pDur === 'number') {
+                    app.config.pDurs = Array(app.config.pCount || 6).fill(app.config.pDur);
+                    delete app.config.pDur; 
+                }
+
+                // MIGRATION / REPAIR: Ensure all subjects have a spec field and standardize Labs
+                app.subjects.forEach(s => {
+                    s.spec = cleanStr(s.spec) || '';
+                    if (s.type === 'Lab (2 Slots)' || s.type === 'Lab (1 Slot)') s.type = 'Lab';
+                });
+                
+                // Ensure legacy saves default to 2 slots for labs
+                if(app.config.labSlots === undefined) app.config.labSlots = 2; 
+
                 if(app.config.onboarded) {
                     showMainApp();
                     refreshUI(); refreshSelectors(); renderDB(); setTab('academic');
                     if(app.subjects.length > 0) switchView('scheduler'); else switchView('data');
                 } else {
                     document.getElementById('setup-root').classList.remove('hidden');
+                    renderSetupPeriods();
                 }
             } else {
                 document.getElementById('setup-root').classList.remove('hidden');
+                renderSetupPeriods();
             }
         };
 
-        const save = () => { localStorage.setItem('uniSchedDynV11', JSON.stringify(app)); refreshUI(); };
+        const save = () => { localStorage.setItem('uniSchedDynV12', JSON.stringify(app)); refreshUI(); };
 
         function showMainApp() {
             document.getElementById('setup-root').classList.add('hidden');
             document.getElementById('app-root').classList.remove('hidden');
+        }
+
+        // --- CUSTOM DURATION UI RENDERERS ---
+        function renderSetupPeriods() {
+            const count = parseInt(document.getElementById('suPCount').value) || 6;
+            let html = '';
+            for(let i=1; i<=count; i++) {
+                let prev = 60;
+                const existingInput = document.getElementById(`suDur${i}`);
+                if (existingInput) prev = existingInput.value;
+                else if (app.config.pDurs && app.config.pDurs[i-1]) prev = app.config.pDurs[i-1];
+                
+                html += `<div><label class="block text-[10px] font-bold text-gray-500 uppercase ml-1">P${i} (mins)</label><input type="number" id="suDur${i}" class="glass-input w-full p-2 rounded-xl text-sm font-bold text-gray-800" value="${prev}" min="10"></div>`;
+            }
+            document.getElementById('suPeriodGrid').innerHTML = html;
+            
+            const lAfter = document.getElementById('suLunchAfter');
+            const lVal = lAfter.value; lAfter.innerHTML = '';
+            for(let i=1; i<=count; i++) lAfter.innerHTML += `<option value="${i}">Period ${i}</option>`;
+            if(lVal <= count) lAfter.value = lVal;
+        }
+
+        function renderConfigPeriods() {
+            const count = parseInt(document.getElementById('cfgPCount').value) || 6;
+            let html = '';
+            for(let i=1; i<=count; i++) {
+                let prev = 60;
+                const existingInput = document.getElementById(`cfgDur${i}`);
+                if (existingInput) prev = existingInput.value;
+                else if (app.config.pDurs && app.config.pDurs[i-1]) prev = app.config.pDurs[i-1];
+                
+                html += `<div><label class="block text-[9px] font-bold text-gray-400 uppercase ml-1">P${i}</label><input type="number" id="cfgDur${i}" class="glass-input w-full p-1.5 rounded-lg text-sm font-bold text-gray-700 text-center" value="${prev}" min="10"></div>`;
+            }
+            document.getElementById('cfgPeriodGrid').innerHTML = html;
+            
+            const lAfter = document.getElementById('cfgLunchAfter');
+            const lVal = lAfter.value; lAfter.innerHTML = '';
+            for(let i=1; i<=count; i++) lAfter.innerHTML += `<option value="${i}">Period ${i}</option>`;
+            if(lVal <= count) lAfter.value = lVal;
         }
 
         // --- SETUP LOGIC ---
@@ -462,22 +553,27 @@
 
         function completeSetup(e) {
             e.preventDefault();
+            const pCount = parseInt(document.getElementById('suPCount').value) || 6;
+            const pDurs = [];
+            for(let i=1; i<=pCount; i++) pDurs.push(parseInt(document.getElementById(`suDur${i}`).value) || 60);
+
             app.config = {
                 onboarded: true,
                 college: document.getElementById('suName').value || 'My University',
                 dept: document.getElementById('suDept').value || 'General Department',
                 start: document.getElementById('suStart').value,
-                end: document.getElementById('suEnd').value,
-                pDur: parseInt(document.getElementById('suDur').value) || 60,
+                pCount: pCount,
+                pDurs: pDurs,
                 hasLunch: document.getElementById('suHasLunch').checked,
                 lDur: parseInt(document.getElementById('suLunchDur').value) || 30,
-                lAfter: parseInt(document.getElementById('suLunchAfter').value) || 3
+                lAfter: parseInt(document.getElementById('suLunchAfter').value) || 3,
+                labSlots: parseInt(document.getElementById('suLabSlots').value) || 2
             };
             save();
             showMainApp();
             refreshUI(); refreshSelectors(); renderDB(); setTab('academic');
             switchView('data');
-            toast('Setup Complete', 'Welcome to the dynamic scheduler!');
+            toast('Setup Complete', 'Custom timetable engine initialized!');
         }
 
         // --- CONFIG MODAL LOGIC ---
@@ -485,8 +581,10 @@
             document.getElementById('cfgCollege').value = app.config.college;
             document.getElementById('cfgDept').value = app.config.dept || '';
             document.getElementById('cfgStart').value = app.config.start;
-            document.getElementById('cfgEnd').value = app.config.end;
-            document.getElementById('cfgSlotDur').value = app.config.pDur;
+            document.getElementById('cfgPCount').value = app.config.pCount || 6;
+            renderConfigPeriods(); // Generate grid inputs
+            
+            document.getElementById('cfgLabSlots').value = app.config.labSlots || 2;
             document.getElementById('cfgHasLunch').checked = app.config.hasLunch;
             document.getElementById('cfgLunchDur').value = app.config.lDur;
             document.getElementById('cfgLunchAfter').value = app.config.lAfter;
@@ -494,13 +592,11 @@
             document.getElementById('cfgLunchOptions').style.opacity = app.config.hasLunch ? '1' : '0.5';
             document.getElementById('cfgLunchOptions').style.pointerEvents = app.config.hasLunch ? 'auto' : 'none';
             
-            // Load Signatures
             const sigs = app.config.signatures || [];
             for(let i=1; i<=4; i++) {
                 document.getElementById(`sig${i}N`).value = sigs[i-1]?.name || '';
                 document.getElementById(`sig${i}R`).value = sigs[i-1]?.role || '';
             }
-
             document.getElementById('modalConfig').classList.remove('hidden');
         }
 
@@ -508,13 +604,18 @@
             app.config.college = document.getElementById('cfgCollege').value;
             app.config.dept = document.getElementById('cfgDept').value;
             app.config.start = document.getElementById('cfgStart').value;
-            app.config.end = document.getElementById('cfgEnd').value;
-            app.config.pDur = parseInt(document.getElementById('cfgSlotDur').value) || 60;
+            
+            const pCount = parseInt(document.getElementById('cfgPCount').value) || 6;
+            const pDurs = [];
+            for(let i=1; i<=pCount; i++) pDurs.push(parseInt(document.getElementById(`cfgDur${i}`).value) || 60);
+            
+            app.config.pCount = pCount;
+            app.config.pDurs = pDurs;
+            app.config.labSlots = parseInt(document.getElementById('cfgLabSlots').value) || 2;
             app.config.hasLunch = document.getElementById('cfgHasLunch').checked;
             app.config.lDur = parseInt(document.getElementById('cfgLunchDur').value) || 30;
             app.config.lAfter = parseInt(document.getElementById('cfgLunchAfter').value) || 3;
             
-            // Save Signatures
             const sigs = [];
             for(let i=1; i<=4; i++) {
                 sigs.push({
@@ -540,10 +641,31 @@
             setTimeout(() => el.classList.add('translate-y-40'), 3500);
         };
 
+        function getEndTimeStr() {
+            if(!app.config.pDurs) return '';
+            let totalMins = app.config.pDurs.reduce((sum, val) => sum + val, 0);
+            if(app.config.hasLunch) totalMins += app.config.lDur;
+            
+            const [sh, sm] = app.config.start.split(':').map(Number);
+            let endMins = (sh * 60) + sm + totalMins;
+            
+            let hh = Math.floor(endMins / 60); let mm = endMins % 60;
+            const ap = hh >= 12 ? 'PM' : 'AM';
+            if(hh > 12) hh -= 12; if(hh === 0) hh = 12;
+            return `${hh}:${mm.toString().padStart(2,'0')} ${ap}`;
+        }
+
         function refreshUI() { 
             document.getElementById('navCollegeName').innerText = app.config.college; 
             document.getElementById('navDeptName').innerText = app.config.dept || '';
-            document.getElementById('navTimings').innerText = `${app.config.start} to ${app.config.end}`;
+            
+            const [sh, sm] = app.config.start.split(':').map(Number);
+            let s_hh = sh, s_ap = 'AM';
+            if(s_hh >= 12) { s_ap = 'PM'; if(s_hh > 12) s_hh -= 12; }
+            if(s_hh === 0) s_hh = 12;
+            const startStr = `${s_hh}:${sm.toString().padStart(2,'0')} ${s_ap}`;
+            
+            document.getElementById('navTimings').innerText = `${startStr} to ${getEndTimeStr()}`;
         }
 
         function setTab(mode) {
@@ -553,6 +675,7 @@
             if(mode === 'academic') {
                 document.getElementById('formTitle').innerText = 'Add Academic Subject';
                 document.getElementById('field-code').classList.remove('hidden');
+                document.getElementById('field-spec').classList.remove('hidden');
                 document.getElementById('lbl-name').innerText = 'Subject Name';
                 document.getElementById('lbl-fac').innerText = 'Faculty Name';
                 document.getElementById('hint-fac').classList.add('hidden');
@@ -560,11 +683,13 @@
             } else {
                 document.getElementById('formTitle').innerText = 'Add Activity';
                 document.getElementById('field-code').classList.add('hidden'); 
+                document.getElementById('field-spec').classList.add('hidden'); // No specs for Activities
                 document.getElementById('lbl-name').innerText = 'Activity Name';
                 document.getElementById('lbl-fac').innerText = 'Supervisor (Optional)';
                 document.getElementById('hint-fac').classList.remove('hidden');
                 ACTIVITY_TYPES.forEach(t => typeSel.appendChild(new Option(t, t)));
             }
+            document.getElementById('inSpec').value = ''; // Reset spec
             document.getElementById('entryMode').value = mode;
         }
 
@@ -572,32 +697,37 @@
         function getSlots() {
             const slots = [];
             const [sh, sm] = app.config.start.split(':').map(Number);
-            const [eh, em] = app.config.end.split(':').map(Number);
             let cm = sh * 60 + sm;
-            const endM = eh * 60 + em;
-            let pIdx = 0;
-            let lunchAdded = false; // Add a flag to track if lunch is already placed
-
+            
             const fmt = (mins) => {
                 let hh = Math.floor(mins / 60); let mm = mins % 60; const ap = hh >= 12 ? 'PM' : 'AM';
                 if(hh > 12) hh -= 12; if(hh === 0) hh = 12; return `${hh}:${mm.toString().padStart(2,'0')} ${ap}`;
             };
 
-            while (cm + app.config.pDur <= endM) {
+            let lunchAdded = false; 
+            const pCount = app.config.pCount || (app.config.pDurs ? app.config.pDurs.length : 6);
+
+            for (let pIdx = 0; pIdx < pCount; pIdx++) {
                 if (app.config.hasLunch && pIdx === app.config.lAfter && !lunchAdded) {
                     const s = cm; cm += app.config.lDur;
                     slots.push({ type: 'lunch', label: `${fmt(s)} - ${fmt(cm)}` });
-                    lunchAdded = true; // Mark lunch as added so it doesn't repeat
-                } else {
-                    const s = cm; cm += app.config.pDur;
-                    slots.push({ type: 'class', label: `${fmt(s)} - ${fmt(cm)}`, idx: pIdx });
-                    pIdx++;
-                }
+                    lunchAdded = true; 
+                } 
+
+                const pDur = app.config.pDurs && app.config.pDurs[pIdx] ? app.config.pDurs[pIdx] : 60;
+                const s = cm; cm += pDur;
+                slots.push({ type: 'class', label: `${fmt(s)} - ${fmt(cm)}`, idx: pIdx });
             }
+            
+            // Edge case: Lunch is at the very end
+            if (app.config.hasLunch && pCount === app.config.lAfter && !lunchAdded) {
+                const s = cm; cm += app.config.lDur;
+                slots.push({ type: 'lunch', label: `${fmt(s)} - ${fmt(cm)}` });
+            }
+
             return slots;
         }
 
-        // --- DATA ENTRY ---
         function saveSubject(e) {
             e.preventDefault();
             const mode = document.getElementById('entryMode').value;
@@ -607,10 +737,13 @@
 
             const form = {
                 batch: cleanStr(document.getElementById('inBatch').value.toUpperCase()),
-                code: code, name: document.getElementById('inName').value.trim(),
+                code: code, 
+                name: document.getElementById('inName').value.trim(),
+                spec: mode === 'academic' ? cleanStr(document.getElementById('inSpec').value) : '',
                 room: document.getElementById('inRoom').value.trim(),
                 fac: cleanStr(document.getElementById('inFac').value) || (mode==='activity' ? 'Staff' : 'TBA'),
-                hrs: parseInt(document.getElementById('inHours').value), type: type
+                hrs: parseInt(document.getElementById('inHours').value), 
+                type: type
             };
 
             if(editId) {
@@ -629,9 +762,10 @@
             const isAct = ACTIVITY_TYPES.includes(s.type);
             setTab(isAct ? 'activity' : 'academic');
             document.getElementById('inBatch').value = s.batch; document.getElementById('inCode').value = s.code;
-            document.getElementById('inName').value = s.name; document.getElementById('inRoom').value = s.room || '';
-            document.getElementById('inFac').value = s.fac; document.getElementById('inHours').value = s.hrs;
-            document.getElementById('inType').value = s.type; editId = id;
+            document.getElementById('inName').value = s.name; document.getElementById('inSpec').value = s.spec || '';
+            document.getElementById('inRoom').value = s.room || ''; document.getElementById('inFac').value = s.fac; 
+            document.getElementById('inHours').value = s.hrs; document.getElementById('inType').value = s.type; 
+            editId = id;
             document.getElementById('saveBtn').innerHTML = 'Update Details'; document.getElementById('cancelBtn').classList.remove('hidden');
         }
 
@@ -644,7 +778,10 @@
                 <tr class="hover:bg-indigo-50/40 group transition-colors">
                     <td class="px-6 py-4 font-bold text-gray-700">${s.batch}</td>
                     <td class="px-6 py-4 font-mono text-indigo-600 font-bold">${s.code}</td>
-                    <td class="px-6 py-4 font-medium">${s.name} ${ACTIVITY_TYPES.includes(s.type) ? '<span class="ml-2 text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded border border-yellow-200">Activity</span>' : ''}</td>
+                    <td class="px-6 py-4 font-medium">${s.name} 
+                        ${s.spec ? `<span class="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200" title="Specialization">${s.spec}</span>` : ''}
+                        ${ACTIVITY_TYPES.includes(s.type) ? '<span class="ml-2 text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded border border-yellow-200">Activity</span>' : ''}
+                    </td>
                     <td class="px-6 py-4 font-bold text-xs">${s.room || '-'}</td>
                     <td class="px-6 py-4 text-xs text-gray-600">${s.fac}</td>
                     <td class="px-6 py-4 text-right">
@@ -652,11 +789,12 @@
                         <button onclick="deleteSubject('${s.id}')" class="text-red-400 hover:text-red-600 bg-white p-2 rounded-lg shadow-sm mx-1"><i class="fa-solid fa-trash-can"></i></button>
                     </td>
                 </tr>`).join('');
-            document.getElementById('dbCount').innerText = `${document.getElementById('dbTable').children.length} Records`;
+            document.getElementById('dbCount').innerText = `${document.getElementById('dbTable').children.length} Records Found`;
         }
 
         function getAcademicFaculty() { return [...new Set(app.subjects.filter(s => !ACTIVITY_TYPES.includes(s.type)).map(s => cleanStr(s.fac)))].sort(); }
         function getRooms() { return [...new Set(app.subjects.map(s => cleanStr(s.room)).filter(Boolean))].sort(); }
+        function getSpecs() { return [...new Set(app.subjects.map(s => cleanStr(s.spec)).filter(Boolean))].sort(); }
 
         function showFreeFac(d, p, label) {
             const allFac = getAcademicFaculty();
@@ -667,22 +805,20 @@
             document.getElementById('modalFree').classList.remove('hidden');
         }
 
-        // --- QUICK ACTIVITY ASSIGNMENT ---
         function promptQuickActivity(day, pIdx, batch) {
-            const act = prompt(`Assign quick activity for ${batch} on ${DAYS[day]} (e.g. Library, Sports, Self Study):`);
+            const act = prompt(`Assign quick activity for ${batch} on ${DAYS[day]} (e.g. Library, Sports):`);
             if(!act || act.trim() === '') return;
             const cleanAct = act.trim();
             const actId = Math.random().toString(36).substr(2);
             app.subjects.push({
                 id: actId, batch: batch, code: cleanAct.substring(0,3).toUpperCase() + '-Q',
-                name: cleanAct, room: '', fac: 'Staff', hrs: 1, type: 'Activity'
+                name: cleanAct, spec: '', room: '', fac: 'Staff', hrs: 1, type: 'Activity'
             });
             app.schedule.push({batch: batch, day: day, pIdx: pIdx, sid: actId});
             save(); loadBatch(batch); renderDB(); refreshSelectors();
             toast('Success', `${cleanAct} assigned successfully.`);
         }
 
-        // --- GRID RENDERING ---
         function renderGrid(domId, entity, mode) {
             const div = document.getElementById(domId);
             const slots = getSlots();
@@ -700,33 +836,40 @@
                             const busyFac = new Set(app.schedule.filter(s => s.day === day && s.pIdx === sl.idx).map(s => { const sb = app.subjects.find(x => x.id === s.sid); return (sb && !ACTIVITY_TYPES.includes(sb.type)) ? cleanStr(sb.fac) : null; }).filter(Boolean));
                             html += `<div onclick="showFreeFac(${day}, ${sl.idx}, '${sl.label}')" class="grid-cell justify-center items-center cursor-pointer hover:bg-green-50 transition border border-transparent hover:border-green-200"><div class="text-2xl font-bold text-green-600">${allFac.length - busyFac.size}</div><div class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Available</div></div>`;
                         } else {
-                            let alloc;
-                            if(mode === 'batch') alloc = app.schedule.find(s => s.batch === entity && s.day === day && s.pIdx === sl.idx);
-                            else if (mode === 'room') alloc = app.schedule.find(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx; });
-                            else alloc = app.schedule.find(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
+                            // Fetch all allocations for this slot using filter() to support concurrent specializations
+                            let allocs = [];
+                            if(mode === 'batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === day && s.pIdx === sl.idx);
+                            else if (mode === 'room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx; });
+                            else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
 
-                            if(alloc) {
-                                const sub = app.subjects.find(s => s.id === alloc.sid);
-                                const isAct = ACTIVITY_TYPES.includes(sub.type);
-                                const color = stringColor(sub.name);
-                                
-                                // Drag setup for Rescheduling already-placed classes
-                                const dragAttrs = mode === 'batch' ? `draggable="true" ondragstart="event.dataTransfer.setData('reschedule', JSON.stringify({batch: '${alloc.batch}', day: ${day}, pIdx: ${sl.idx}, sid: '${alloc.sid}'}))"` : '';
+                            const dropAttrs = mode === 'batch' ? `ondragover="event.preventDefault(); this.classList.add('drag-active')" ondragleave="this.classList.remove('drag-active')" ondrop="handleDrop(event, ${day}, ${sl.idx}, '${entity}')"` : '';
 
-                                html += `<div class="grid-cell justify-center text-center p-1 group relative hover:brightness-95 transition scheduled-item" ${dragAttrs} style="background-color: ${color}15; border-left: 3px solid ${color}">
-                                        <div class="font-bold text-xs text-gray-800 leading-tight">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</div>
-                                        <div class="text-[10px] leading-tight text-gray-600 my-1 line-clamp-2">${sub.name}</div>
-                                        <div class="text-[9px] font-bold text-gray-400 uppercase tracking-tight">${mode==='batch' ? sub.fac : mode==='room' ? sub.fac : (sub.room || 'N/A')}</div>
-                                        ${isAct ? '<div class="absolute top-1 right-1 text-yellow-500"><i class="fa-solid fa-star text-[8px]"></i></div>' : ''}
-                                        ${mode==='batch' && sub.room ? `<div class="text-[9px] text-indigo-600 font-bold mt-0.5"><i class="fa-solid fa-door-open"></i> ${sub.room}</div>` : ''}
-                                        ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx})" class="absolute top-0 right-0 p-1 text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 transition"><i class="fa-solid fa-circle-xmark"></i></button>` : ''}
-                                    </div>`;
+                            if(allocs.length > 0) {
+                                html += `<div class="grid-cell p-0.5 flex flex-col gap-0.5 transition-colors group relative overflow-y-auto c-scroll" ${dropAttrs}>`;
+                                allocs.forEach(alloc => {
+                                    const sub = app.subjects.find(s => s.id === alloc.sid);
+                                    if(!sub) return;
+                                    const isAct = ACTIVITY_TYPES.includes(sub.type);
+                                    const color = stringColor(sub.name);
+                                    
+                                    const dragAttrs = mode === 'batch' ? `draggable="true" ondragstart="event.dataTransfer.setData('reschedule', JSON.stringify({batch: '${alloc.batch}', day: ${day}, pIdx: ${sl.idx}, sid: '${alloc.sid}'})); event.stopPropagation();"` : '';
+
+                                    // Compact rendering if multiple
+                                    html += `<div class="p-1 group/item relative hover:brightness-95 transition scheduled-item shadow-sm rounded-sm shrink-0 border border-transparent hover:border-gray-300 bg-white" ${dragAttrs} style="border-left: 3px solid ${color}; min-height: 40px; display:flex; flex-direction:column; justify-content:center;">
+                                            <div class="flex justify-between items-start">
+                                                <div class="font-bold text-[10px] text-gray-800 leading-tight">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</div>
+                                                ${sub.spec ? `<div class="text-[8px] bg-blue-100 text-blue-700 px-1 rounded ml-1 truncate max-w-[40px]">${sub.spec}</div>` : ''}
+                                            </div>
+                                            <div class="text-[9px] leading-tight text-gray-600 my-0.5 line-clamp-1">${sub.name}</div>
+                                            <div class="text-[8px] font-bold text-gray-400 uppercase tracking-tight">${mode==='batch' ? sub.fac : mode==='room' ? sub.fac : (sub.room || 'N/A')}</div>
+                                            ${mode==='batch' && sub.room ? `<div class="text-[8px] text-indigo-600 font-bold"><i class="fa-solid fa-door-open"></i> ${sub.room}</div>` : ''}
+                                            ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx}, '${sub.id}')" class="absolute top-0 right-0 p-1 text-red-400 opacity-0 group-hover/item:opacity-100 hover:text-red-600 transition z-10"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
+                                        </div>`;
+                                });
+                                html += `</div>`;
                             } else {
                                 if(mode === 'batch') {
-                                    html += `<div class="grid-cell hover:bg-indigo-50/50 transition-colors group relative" 
-                                        ondragover="event.preventDefault(); this.classList.add('drag-active')" 
-                                        ondragleave="this.classList.remove('drag-active')" 
-                                        ondrop="handleDrop(event, ${day}, ${sl.idx}, '${entity}')">
+                                    html += `<div class="grid-cell hover:bg-indigo-50/50 transition-colors group relative" ${dropAttrs}>
                                         <button onclick="promptQuickActivity(${day}, ${sl.idx}, '${entity}')" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-white/50 text-indigo-400 hover:text-indigo-600 text-[10px] font-bold transition rounded shadow-inner">
                                             + Add Activity
                                         </button>
@@ -742,7 +885,6 @@
             div.innerHTML = html;
         }
 
-        // --- SCHEDULING ---
         function loadBatch(b) {
             if(!b) return;
             const pool = document.getElementById('pool'); pool.innerHTML = '';
@@ -757,7 +899,15 @@
                     const el = document.createElement('div');
                     el.className = "glass-panel p-3 rounded-xl cursor-grab active:cursor-grabbing border-l-4 hover:bg-white transition transform hover:translate-x-1";
                     el.style.borderLeftColor = stringColor(s.name); el.draggable = true;
-                    el.innerHTML = `<div class="flex justify-between items-start"><span class="font-bold text-xs text-gray-800">${s.code}</span><span class="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full font-bold">${rem}h</span></div><div class="text-xs font-medium text-gray-700 mt-1 truncate" title="${s.name}">${s.name}</div><div class="flex justify-between mt-1 text-[10px] text-gray-500 font-medium"><span>${s.fac}</span><span>${s.room ? '<i class="fa-solid fa-location-dot"></i> '+s.room : ''}</span></div>${s.type==='Lab' ? '<div class="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>' : ''}${ACTIVITY_TYPES.includes(s.type) ? '<div class="absolute bottom-1 right-1 text-[9px] bg-yellow-100 text-yellow-700 px-1 rounded">Activity</div>' : ''}`;
+                    el.innerHTML = `<div class="flex justify-between items-start">
+                            <span class="font-bold text-xs text-gray-800">${s.code}</span>
+                            <span class="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full font-bold">${rem}h</span>
+                        </div>
+                        <div class="text-xs font-medium text-gray-700 mt-1 truncate" title="${s.name}">${s.name}</div>
+                        <div class="flex justify-between mt-1 text-[10px] text-gray-500 font-medium"><span>${s.fac}</span><span>${s.room ? '<i class="fa-solid fa-location-dot"></i> '+s.room : ''}</span></div>
+                        ${s.type === 'Lab' && app.config.labSlots === 2 ? `<div class="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full animate-pulse" title="2-Slot Lab"></div>` : ''}
+                        ${ACTIVITY_TYPES.includes(s.type) ? '<div class="absolute bottom-1 right-1 text-[9px] bg-yellow-100 text-yellow-700 px-1 rounded">Activity</div>' : ''}
+                        ${s.spec ? `<div class="absolute bottom-1 right-1 text-[9px] bg-blue-100 text-blue-700 px-1 rounded shadow-sm border border-blue-200">Track: ${s.spec}</div>` : ''}`;
                     el.ondragstart = e => e.dataTransfer.setData('pool_item', JSON.stringify(s));
                     pool.appendChild(el);
                 }
@@ -767,9 +917,8 @@
         }
 
         function handleDrop(e, day, p, b) {
-            e.preventDefault(); e.target.classList.remove('drag-active');
+            e.preventDefault(); e.currentTarget.classList.remove('drag-active');
             
-            // Check if it's a reschedule or a new item from pool
             const reschedData = e.dataTransfer.getData('reschedule');
             const poolData = e.dataTransfer.getData('pool_item');
             
@@ -777,27 +926,24 @@
             const tClasses = slots.filter(x=>x.type==='class').length;
 
             if(reschedData) {
-                // DRAG & DROP RESCHEDULE LOGIC
                 const { batch: oldB, day: oldD, pIdx: oldP, sid } = JSON.parse(reschedData);
                 const s = app.subjects.find(x => x.id === sid);
+                if(!s) return;
                 
-                // Temporarily remove it from schedule array so it doesn't block itself
                 const tempSched = [...app.schedule];
-                
-                // Safely remove ONLY the specific dragged item and its lab partner
                 app.schedule = app.schedule.filter(x => {
                     if (x.batch === oldB && x.day === oldD && x.pIdx === oldP && x.sid === sid) return false;
-                    if (s.type === 'Lab' && x.batch === oldB && x.day === oldD && x.sid === sid && (x.pIdx === oldP - 1 || x.pIdx === oldP + 1)) return false;
+                    if (s.type === 'Lab' && app.config.labSlots === 2 && x.batch === oldB && x.day === oldD && x.sid === sid && (x.pIdx === oldP - 1 || x.pIdx === oldP + 1)) return false;
                     return true;
                 });
 
-                if(s.type === 'Lab') {
+                if(s.type === 'Lab' && app.config.labSlots === 2) {
                     if(p + 1 >= tClasses) { app.schedule = tempSched; return toast('Error', 'Lab needs 2 slots.', true); }
                     if(app.config.hasLunch && p === app.config.lAfter - 1) { app.schedule = tempSched; return toast('Error', 'Cannot overlap lunch.', true); }
-                    if(!isFree(b, day, p, s.fac, s.type, s.room) || !isFree(b, day, p+1, s.fac, s.type, s.room)) { app.schedule = tempSched; return toast('Conflict', 'Clash detected.', true); }
+                    if(!isFree(b, day, p, s.id) || !isFree(b, day, p+1, s.id)) { app.schedule = tempSched; return toast('Conflict', 'Clash detected.', true); }
                     app.schedule.push({batch:b, day, pIdx:p, sid:s.id}, {batch:b, day, pIdx:p+1, sid:s.id});
                 } else {
-                    if(!isFree(b, day, p, s.fac, s.type, s.room)) { app.schedule = tempSched; return toast('Conflict', 'Clash detected.', true); }
+                    if(!isFree(b, day, p, s.id)) { app.schedule = tempSched; return toast('Conflict', 'Clash detected.', true); }
                     app.schedule.push({batch:b, day, pIdx:p, sid:s.id});
                 }
                 save(); loadBatch(b);
@@ -805,61 +951,82 @@
             }
 
             if(poolData) {
-                // NEW ITEM FROM POOL LOGIC
                 const s = JSON.parse(poolData);
-                if(s.type === 'Lab') {
+                if(s.type === 'Lab' && app.config.labSlots === 2) {
                     if(p + 1 >= tClasses) return toast('Error', 'Lab requires 2 slots.', true);
                     if(app.config.hasLunch && p === app.config.lAfter - 1) return toast('Error', 'Lab cannot span over lunch.', true);
-                    if(!isFree(b, day, p, s.fac, s.type, s.room) || !isFree(b, day, p+1, s.fac, s.type, s.room)) return toast('Conflict', 'Faculty, Batch, or Room busy.', true);
+                    if(!isFree(b, day, p, s.id) || !isFree(b, day, p+1, s.id)) return toast('Conflict', 'Clash detected.', true);
                     app.schedule.push({batch:b, day, pIdx:p, sid:s.id}, {batch:b, day, pIdx:p+1, sid:s.id});
                 } else {
-                    if(!isFree(b, day, p, s.fac, s.type, s.room)) return toast('Conflict', 'Faculty, Batch, or Room busy.', true);
+                    if(!isFree(b, day, p, s.id)) return toast('Conflict', 'Clash detected.', true);
                     app.schedule.push({batch:b, day, pIdx:p, sid:s.id});
                 }
                 save(); loadBatch(b);
             }
         }
 
-        function removeAlloc(b, d, p) {
-            const sl = app.schedule.find(s => s.batch === b && s.day === d && s.pIdx === p); if(!sl) return;
-            const sub = app.subjects.find(s => s.id === sl.sid);
-            
-            // Safely remove only this specific slot and its partner
+        function removeAlloc(b, d, p, sid) {
+            const sub = app.subjects.find(s => s.id === sid);
             app.schedule = app.schedule.filter(x => {
-                if (x.batch === b && x.day === d && x.pIdx === p && x.sid === sl.sid) return false;
-                if (sub && sub.type === 'Lab' && x.batch === b && x.day === d && x.sid === sl.sid && (x.pIdx === p - 1 || x.pIdx === p + 1)) return false;
+                if (x.batch === b && x.day === d && x.pIdx === p && x.sid === sid) return false;
+                if (sub && sub.type === 'Lab' && app.config.labSlots === 2 && x.batch === b && x.day === d && x.sid === sid && (x.pIdx === p - 1 || x.pIdx === p + 1)) return false;
                 return true;
             });
-            
             save(); loadBatch(b);
         }
 
-        function isFree(b, d, p, f, type, room = '') {
-            if(app.schedule.some(s => s.batch === b && s.day === d && s.pIdx === p)) return false; // Batch Check
+        function isFree(b, d, p, sid) {
+            const sub = app.subjects.find(x => x.id === sid);
+            if(!sub) return false;
             
-            // Check Room Conflict
-            if (room && room.trim() !== '') {
+            // 1. Room Conflict
+            if (sub.room && sub.room.trim() !== '') {
                 const roomBusy = app.schedule.some(s => {
                     if(s.day !== d || s.pIdx !== p) return false;
                     const sb = app.subjects.find(x => x.id === s.sid);
-                    return sb && cleanStr(sb.room) === cleanStr(room);
+                    return sb && cleanStr(sb.room) === cleanStr(sub.room);
                 });
                 if(roomBusy) return false;
             }
 
-            if(ACTIVITY_TYPES.includes(type)) return true; // Activities don't clash faculty
+            // 2. Faculty Conflict (Skip for activities)
+            if (!ACTIVITY_TYPES.includes(sub.type)) {
+                const facBusy = app.schedule.some(s => {
+                    if(s.day !== d || s.pIdx !== p) return false;
+                    const sb = app.subjects.find(x => x.id === s.sid);
+                    return sb && cleanStr(sb.fac) === cleanStr(sub.fac) && !ACTIVITY_TYPES.includes(sb.type);
+                });
+                if(facBusy) return false;
+            }
 
-            // Check Faculty Conflict
-            return !app.schedule.some(s => {
-                if(s.day !== d || s.pIdx !== p) return false;
-                const sb = app.subjects.find(x => x.id === s.sid);
-                return sb && cleanStr(sb.fac) === cleanStr(f) && !ACTIVITY_TYPES.includes(sb.type);
-            });
+            // 3. Batch / Specialization Concurrency Check
+            const batchAllocs = app.schedule.filter(s => s.batch === b && s.day === d && s.pIdx === p);
+            if (batchAllocs.length > 0) {
+                const subSpec = cleanStr(sub.spec);
+                
+                // If incoming subject is CORE (no spec), it clashes with ANYTHING existing.
+                if (!subSpec) return false; 
+
+                // Check existing allocations
+                for (let alloc of batchAllocs) {
+                    const existingSub = app.subjects.find(x => x.id === alloc.sid);
+                    if (existingSub) {
+                        const existingSpec = cleanStr(existingSub.spec);
+                        
+                        // If existing subject is CORE, it blocks this incoming spec
+                        if (!existingSpec) return false;
+                        
+                        // If existing subject has SAME spec, they clash
+                        if (existingSpec === subSpec) return false;
+                    }
+                }
+            }
+            return true;
         }
 
         function autoSchedule() {
             const b = document.getElementById('selBatch').value; if(!b) return;
-            const subs = app.subjects.filter(s => s.batch === b).map(s => ({...s, rem: s.hrs - app.schedule.filter(x => x.sid === s.id).length})).filter(s => s.rem > 0).sort((x, y) => (x.type === 'Lab' ? -1 : 1)); 
+            const subs = app.subjects.filter(s => s.batch === b).map(s => ({...s, rem: s.hrs - app.schedule.filter(x => x.sid === s.id).length})).filter(s => s.rem > 0).sort((x, y) => (x.type === 'Lab' && app.config.labSlots === 2 ? -1 : 1)); 
             const slots = [];
             const tClasses = getSlots().filter(x=>x.type==='class').length;
             for(let d=0; d<6; d++) for(let p=0; p<tClasses; p++) slots.push({d, p});
@@ -869,16 +1036,16 @@
                 slots.sort(() => Math.random() - 0.5);
                 while(s.rem > 0) {
                     let placed = false;
-                    if(s.type === 'Lab' && s.rem >= 2) {
+                    if(s.type === 'Lab' && app.config.labSlots === 2 && s.rem >= 2) {
                         for(let k of slots) {
-                            if(k.p + 1 < tClasses && (!app.config.hasLunch || k.p !== app.config.lAfter - 1) && isFree(b, k.d, k.p, s.fac, s.type, s.room) && isFree(b, k.d, k.p+1, s.fac, s.type, s.room)) {
+                            if(k.p + 1 < tClasses && (!app.config.hasLunch || k.p !== app.config.lAfter - 1) && isFree(b, k.d, k.p, s.id) && isFree(b, k.d, k.p+1, s.id)) {
                                 app.schedule.push({batch:b, day:k.d, pIdx:k.p, sid:s.id}, {batch:b, day:k.d, pIdx:k.p+1, sid:s.id});
                                 s.rem -= 2; assigned += 2; placed = true; break;
                             }
                         }
                     } else {
                         for(let k of slots) {
-                            if(isFree(b, k.d, k.p, s.fac, s.type, s.room)) {
+                            if(isFree(b, k.d, k.p, s.id)) {
                                 app.schedule.push({batch:b, day:k.d, pIdx:k.p, sid:s.id});
                                 s.rem--; assigned++; placed = true; break;
                             }
@@ -895,12 +1062,10 @@
             if(confirm(`Clear schedule for ${b}?`)) { app.schedule = app.schedule.filter(s => s.batch !== b); save(); loadBatch(b); toast('Reset', `${b} cleared.`); }
         }
 
-        // --- BACKUP, EXPORT & PRINT ---
         function backupData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(app)], {type: 'application/json'})); a.download = `Scheduler_Backup.json`; a.click(); }
         function restoreData(i) { const f = i.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { app = JSON.parse(e.target.result); save(); location.reload(); } catch(e) { toast('Error', 'Invalid File', true); } }; r.readAsText(f); }
-        function resetAll() { if(confirm("⚠️ FACTORY RESET WARNING ⚠️\nDelete ALL data?")) { localStorage.removeItem('uniSchedDynV11'); location.reload(); } }
+        function resetAll() { if(confirm("⚠️ FACTORY RESET WARNING ⚠️\nDelete ALL data?")) { localStorage.removeItem('uniSchedDynV12'); location.reload(); } }
 
-        // --- NEW VECTOR PDF ENGINE (jsPDF + autoTable) ---
         function exportPDF() {
             if (app.schedule.length === 0) return toast('Warning', 'Schedule is empty.', true);
             const { jsPDF } = window.jspdf;
@@ -930,17 +1095,19 @@
                     slots.forEach(sl => {
                         if (sl.type === 'lunch') { row.push('BREAK'); } 
                         else {
-                            let alloc;
-                            if (type === 'Batch') alloc = app.schedule.find(s => s.batch === entity && s.day === d && s.pIdx === sl.idx);
-                            else if (type === 'Room') alloc = app.schedule.find(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === d && s.pIdx === sl.idx; });
-                            else alloc = app.schedule.find(s => {
-                                    const sub = app.subjects.find(x => x.id === s.sid);
-                                    return sub && cleanStr(sub.fac) === entity && s.day === d && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
-                                });
+                            let allocs = [];
+                            if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === d && s.pIdx === sl.idx);
+                            else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === d && s.pIdx === sl.idx; });
+                            else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === d && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
                                 
-                            if (alloc) {
-                                const sub = app.subjects.find(x => x.id === alloc.sid);
-                                row.push(`${sub.code}\n${type === 'Batch' ? sub.fac : type === 'Room' ? sub.batch : sub.batch}\n${type === 'Room' ? sub.fac : (sub.room || '')}`);
+                            if (allocs.length > 0) {
+                                let texts = allocs.map(alloc => {
+                                    const sub = app.subjects.find(x => x.id === alloc.sid);
+                                    let txt = `${sub.code}\n${type === 'Batch' ? sub.fac : type === 'Room' ? sub.batch : sub.batch}\n${type === 'Room' ? sub.fac : (sub.room || '')}`;
+                                    if(sub.spec) txt += `\n[${sub.spec}]`;
+                                    return txt;
+                                });
+                                row.push(texts.join('\n------\n'));
                             } else { row.push(''); }
                         }
                     });
@@ -949,7 +1116,7 @@
 
                 doc.autoTable({
                     startY: 38, head: [headers], body: body, theme: 'grid',
-                    styles: { fontSize: 9, halign: 'center', valign: 'middle', cellPadding: 3 },
+                    styles: { fontSize: 8, halign: 'center', valign: 'middle', cellPadding: 2 },
                     headStyles: { fillColor: [79, 70, 229] },
                     didDrawPage: (data) => {
                         if (sigs.length > 0) {
@@ -976,7 +1143,6 @@
             toast('Success', 'Vector PDF generated successfully.');
         }
 
-        // --- NEW EXCEL EXPORT (Batches & Faculty) ---
         function exportExcel() {
             if (app.schedule.length === 0) return toast('Warning', 'Schedule is empty.', true);
             const wb = XLSX.utils.book_new();
@@ -1000,20 +1166,20 @@
                     slots.forEach(sl => {
                         if (sl.type === 'lunch') { row.push('BREAK'); } 
                         else {
-                            let alloc;
-                            if (type === 'Batch') alloc = app.schedule.find(s => s.batch === entity && s.day === d && s.pIdx === sl.idx);
-                            else if (type === 'Room') alloc = app.schedule.find(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === d && s.pIdx === sl.idx; });
-                            else alloc = app.schedule.find(s => {
-                                    const sub = app.subjects.find(x => x.id === s.sid);
-                                    return sub && cleanStr(sub.fac) === entity && s.day === d && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
-                                });
+                            let allocs = [];
+                            if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === d && s.pIdx === sl.idx);
+                            else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === d && s.pIdx === sl.idx; });
+                            else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === d && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
                                 
-                            if (alloc) {
-                                const sub = app.subjects.find(x => x.id === alloc.sid);
-                                let txt = `${sub.name} [${sub.code}] - ${type === 'Batch' ? sub.fac : sub.batch}`;
-                                if (type !== 'Room' && sub.room) txt += ` (Room: ${sub.room})`;
-                                else if (type === 'Room') txt += ` (Fac: ${sub.fac})`;
-                                row.push(txt);
+                            if (allocs.length > 0) {
+                                let texts = allocs.map(alloc => {
+                                    const sub = app.subjects.find(x => x.id === alloc.sid);
+                                    let txt = `${sub.name} ${sub.spec?`[${sub.spec}]`:''} - ${sub.code}`;
+                                    txt += `\n${type === 'Batch' ? sub.fac : sub.batch}`;
+                                    if (type !== 'Room' && sub.room) txt += ` (Room: ${sub.room})`;
+                                    return txt;
+                                });
+                                row.push(texts.join('\n---\n'));
                             } else { row.push(''); }
                         }
                     });
@@ -1030,7 +1196,6 @@
             toast('Success', 'Excel workbook generated successfully.');
         }
 
-        // --- NEW HTML NATIVE PRINT ENGINE ---
         function printAll() {
             if (app.schedule.length === 0) return toast('Warning', 'Schedule is empty.', true);
             const div = document.getElementById('print-root');
@@ -1063,22 +1228,24 @@
                         if (sl.type === 'lunch') {
                             if (dIdx === 0) h += `<td rowspan="${DAYS.length}" class="print-lunch-cell">LUNCH BREAK</td>`;
                         } else {
-                            let alloc;
-                            if (type === 'Batch') alloc = app.schedule.find(s => s.batch === entity && s.day === dIdx && s.pIdx === sl.idx);
-                            else if (type === 'Room') alloc = app.schedule.find(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === dIdx && s.pIdx === sl.idx; });
-                            else alloc = app.schedule.find(s => {
-                                    const sub = app.subjects.find(x => x.id === s.sid);
-                                    return sub && cleanStr(sub.fac) === entity && s.day === dIdx && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
-                                });
+                            let allocs = [];
+                            if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === dIdx && s.pIdx === sl.idx);
+                            else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === dIdx && s.pIdx === sl.idx; });
+                            else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === dIdx && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
                             
-                            if (alloc) {
-                                const sub = app.subjects.find(z => z.id === alloc.sid);
-                                h += `<td>
-                                    <div style="font-weight:bold; color:#000;">${sub.code}</div>
-                                    <div style="font-size:10px;">${type === 'Batch' ? sub.fac : sub.batch}</div>
-                                    ${type !== 'Room' && sub.room ? `<div style="font-size:10px; font-weight:bold;">[${sub.room}]</div>` : ''}
-                                    ${type === 'Room' ? `<div style="font-size:10px; font-weight:bold;">[${sub.fac}]</div>` : ''}
-                                </td>`;
+                            if (allocs.length > 0) {
+                                h += `<td><div style="display:flex; flex-direction:column; gap:4px; height:100%;">`;
+                                allocs.forEach((alloc, i) => {
+                                    const sub = app.subjects.find(z => z.id === alloc.sid);
+                                    if(i > 0) h += `<div style="border-top:1px dashed #aaa; margin-top:2px; padding-top:2px;"></div>`;
+                                    h += `<div>
+                                        <div style="font-weight:bold; color:#000;">${sub.code} ${sub.spec ? `<span style="font-size:8px; border:1px solid #000; padding:1px 3px; border-radius:3px;">${sub.spec}</span>` : ''}</div>
+                                        <div style="font-size:10px;">${type === 'Batch' ? sub.fac : sub.batch}</div>
+                                        ${type !== 'Room' && sub.room ? `<div style="font-size:10px; font-weight:bold;">[${sub.room}]</div>` : ''}
+                                        ${type === 'Room' ? `<div style="font-size:10px; font-weight:bold;">[${sub.fac}]</div>` : ''}
+                                    </div>`;
+                                });
+                                h += `</div></td>`;
                             } else { h += `<td></td>`; }
                         }
                     });
@@ -1120,9 +1287,15 @@
             const b = [...new Set(app.subjects.map(s => s.batch))].sort(); 
             const f = getAcademicFaculty();
             const r = getRooms();
-            const pop = (id, arr) => { const el = document.getElementById(id); const v = el.value; el.innerHTML = '<option value="">Select...</option>' + arr.map(x => `<option value="${x}">${x}</option>`).join(''); if(arr.includes(v)) el.value = v; };
+            const specs = getSpecs();
+            
+            const pop = (id, arr) => { const el = document.getElementById(id); if(!el) return; const v = el.value; el.innerHTML = '<option value="">Select...</option>' + arr.map(x => `<option value="${x}">${x}</option>`).join(''); if(arr.includes(v)) el.value = v; };
             pop('selBatch', b); pop('selFacView', f); pop('selRoomView', r);
-            document.getElementById('dl-batch').innerHTML = b.map(x => `<option value="${x}">`).join(''); document.getElementById('dl-fac').innerHTML = f.map(x => `<option value="${x}">`).join('');
+            
+            document.getElementById('dl-batch').innerHTML = b.map(x => `<option value="${x}">`).join(''); 
+            document.getElementById('dl-fac').innerHTML = f.map(x => `<option value="${x}">`).join('');
+            document.getElementById('dl-room').innerHTML = r.map(x => `<option value="${x}">`).join('');
+            document.getElementById('dl-spec').innerHTML = specs.map(x => `<option value="${x}">`).join('');
         }
 
         function loadFacultyView(f) { renderGrid('grid-fac', f, 'fac'); }
@@ -1142,7 +1315,7 @@
                         app.subjects.push({
                             id: Math.random().toString(36).substr(2),
                             code: cleanStr(row[0]), name: row[1], fac: cleanStr(row[2]), batch: cleanStr(row[3]),
-                            hrs: parseInt(row[4]||3), type: row[5]||'Lecture', room: row[6]||''
+                            hrs: parseInt(row[4]||3), type: row[5]||'Lecture', room: row[6]||'', spec: cleanStr(row[7]) || ''
                         }); c++;
                     }
                 }
@@ -1154,11 +1327,12 @@
         function dlTemplate(){ 
             const wb = XLSX.utils.book_new();
             const ws_data = [
-                ["Code", "Subject", "Faculty", "Batch", "Hours", "Type", "Room"], 
-                ["CS-101", "Mathematics", "Dr. Smith", "BCA-1", 4, "Lecture", "Room-101"], 
-                ["CS-102", "Physics Lab", "Prof. Doe", "BCA-1", 2, "Lab", "Lab-1"], 
-                ["ACT-01", "Sports", "Coach Mike", "BCA-1", 1, "Activity", "Ground"], 
-                ["LIB-01", "Library", "Mrs. Sarah", "BCA-1", 1, "Activity", "Lib-Hall"]
+                ["Code", "Subject", "Faculty", "Batch", "Hours", "Type", "Room", "Specialization"], 
+                ["CS-101", "Mathematics", "Dr. Smith", "BCA-1", 4, "Lecture", "Room-101", ""], 
+                ["CS-102", "Physics Lab", "Prof. Doe", "BCA-1", 2, "Lab", "Lab-1", ""],
+                ["AIML-01", "Python for ML", "Dr. Alan", "BCA-1", 3, "Lecture", "Lab-2", "AIML"],
+                ["CYB-01", "Network Security", "Dr. Bob", "BCA-1", 3, "Lecture", "Lab-3", "Cyber Security"],
+                ["ACT-01", "Sports", "Coach Mike", "BCA-1", 1, "Activity", "Ground", ""]
             ];
             const ws = XLSX.utils.aoa_to_sheet(ws_data);
             XLSX.utils.book_append_sheet(wb, ws, "Template");
