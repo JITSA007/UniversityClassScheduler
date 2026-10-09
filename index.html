@@ -98,8 +98,18 @@
                 <div class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl text-white flex items-center justify-center shadow-lg mx-auto mb-4">
                     <i class="fa-solid fa-graduation-cap text-3xl"></i>
                 </div>
-                <h2 class="text-2xl font-extrabold text-gray-900">Welcome to Scheduler</h2>
-                <p class="text-sm text-gray-500 mt-1">Configure your core university timing rules.</p>
+                <h2 class="text-2xl font-extrabold text-gray-900">Welcome to University Scheduler</h2>
+                <p class="text-xs text-gray-500 font-medium mt-0.5">Configure your core college timing rules.</p>
+                
+                <!-- DEVELOPER & LICENSE WARNING -->
+                <div class="mt-4 p-3.5 bg-amber-50 rounded-2xl border border-amber-200 text-left text-xs">
+                    <div class="font-extrabold text-indigo-900 flex items-center gap-1.5 mb-1">
+                        <i class="fa-solid fa-code text-indigo-600"></i> Developed by Jitendra Prajapat (Ph: 9664301637)
+                    </div>
+                    <div class="text-[11px] text-amber-900 font-medium leading-relaxed">
+                        <strong class="text-red-700 uppercase"><i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Warning:</strong> Commercial use in universities, colleges, or business setups requires purchasing a license/paying developer <strong>Jitendra Prajapat</strong>.
+                    </div>
+                </div>
             </div>
 
             <form id="setupForm" onsubmit="completeSetup(event)" class="space-y-5">
@@ -172,62 +182,72 @@
 
     <!-- MAIN APP -->
     <div id="app-root" class="flex flex-col h-full hidden">
-        <nav class="glass-panel m-3 p-3 rounded-2xl flex justify-between items-center shrink-0 z-50">
-            <div class="flex items-center gap-4 px-2">
-                <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl text-white flex items-center justify-center shadow-lg">
-                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
+        <nav class="glass-panel m-2 p-2.5 rounded-2xl flex flex-wrap justify-between items-center shrink-0 z-50 gap-2 border border-white/50 shadow-md">
+            <div class="flex items-center gap-3 px-1">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 via-purple-600 to-violet-600 rounded-xl text-white flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold leading-none tracking-tight text-gray-900" id="navCollegeName">University Scheduler</h1>
+                    <h1 class="text-lg font-extrabold leading-none tracking-tight text-gray-900" id="navCollegeName">University Scheduler</h1>
                     <p class="text-[11px] font-bold text-gray-600 mt-0.5" id="navDeptName">Department</p>
-                    <p class="text-[9px] uppercase font-bold text-indigo-600 tracking-widest" id="navTimings">Dynamic Edition</p>
                 </div>
             </div>
 
-            <div class="flex bg-gray-100/60 p-1.5 rounded-xl gap-1 backdrop-blur-md">
-                <button onclick="switchView('data')" id="btn-data" class="px-5 py-2.5 rounded-lg text-xs font-bold text-indigo-700 bg-white shadow-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-database"></i> Data Entry
+            <div class="flex bg-gray-100/80 p-1 rounded-xl gap-0.5 backdrop-blur-md border border-gray-200/60 shadow-inner">
+                <button onclick="switchView('data')" id="btn-data" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-indigo-700 bg-white shadow-xs transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-database text-[11px]"></i> Data
                 </button>
-                <button onclick="switchView('scheduler')" id="btn-scheduler" class="px-5 py-2.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-days"></i> Scheduler
+                <button onclick="switchView('scheduler')" id="btn-scheduler" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-days text-[11px]"></i> Scheduler
                 </button>
-                <button onclick="switchView('faculty')" id="btn-faculty" class="px-5 py-2.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2">
-                    <i class="fa-solid fa-chalkboard-user"></i> Faculty
+                <button onclick="switchView('faculty')" id="btn-faculty" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-chalkboard-user text-[11px]"></i> Faculty
                 </button>
-                <button onclick="switchView('room')" id="btn-room" class="px-5 py-2.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2">
-                    <i class="fa-solid fa-door-open"></i> Rooms
+                <button onclick="switchView('room')" id="btn-room" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-door-open text-[11px]"></i> Rooms
                 </button>
-                <button onclick="switchView('free')" id="btn-free" class="px-5 py-2.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2">
-                    <i class="fa-solid fa-binoculars"></i> Free Finder
+                <button onclick="switchView('free')" id="btn-free" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-binoculars text-[11px]"></i> Free Finder
+                </button>
+                <button onclick="switchView('day')" id="btn-day" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-day text-[11px]"></i> Day View
                 </button>
             </div>
 
-            <div class="flex gap-2 items-center">
-                <button onclick="openConfig()" class="glass-btn w-10 h-10 rounded-xl text-gray-700 hover:text-indigo-600 flex items-center justify-center" title="Settings">
-                    <i class="fa-solid fa-gear text-lg"></i>
+            <div class="flex gap-1.5 items-center flex-wrap">
+                <button onclick="openWorkloadModal()" class="glass-btn p-2 rounded-xl text-indigo-600 hover:text-indigo-800 transition" title="Faculty Workload Analytics">
+                    <i class="fa-solid fa-chart-pie text-base"></i>
                 </button>
-                <div class="h-8 w-px bg-gray-400/30 mx-1"></div>
-                <button onclick="backupData()" class="glass-btn w-10 h-10 rounded-xl text-blue-600 hover:text-blue-800 flex items-center justify-center" title="Backup JSON">
-                    <i class="fa-solid fa-download"></i>
+                <button onclick="openConfig()" class="glass-btn p-2 rounded-xl text-gray-700 hover:text-indigo-600 transition" title="Settings">
+                    <i class="fa-solid fa-gear text-base"></i>
                 </button>
-                <button onclick="document.getElementById('restoreFile').click()" class="glass-btn w-10 h-10 rounded-xl text-blue-600 hover:text-blue-800 flex items-center justify-center" title="Restore JSON">
-                    <i class="fa-solid fa-upload"></i>
+                <div class="h-6 w-px bg-gray-300/60 mx-0.5"></div>
+                <button onclick="backupData()" class="glass-btn p-2 rounded-xl text-blue-600 hover:text-blue-800 transition" title="Backup JSON">
+                    <i class="fa-solid fa-download text-sm"></i>
+                </button>
+                <button onclick="document.getElementById('restoreFile').click()" class="glass-btn p-2 rounded-xl text-blue-600 hover:text-blue-800 transition" title="Restore JSON">
+                    <i class="fa-solid fa-upload text-sm"></i>
                 </button>
                 <input type="file" id="restoreFile" class="hidden" accept=".json" onchange="restoreData(this)">
-                <div class="h-8 w-px bg-gray-400/30 mx-1"></div>
+                <div class="h-6 w-px bg-gray-300/60 mx-0.5"></div>
                 
-                <button onclick="exportPDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                <button onclick="exportPDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1">
                     <i class="fa-solid fa-file-pdf"></i> PDF
                 </button>
-                <button onclick="exportExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                <button onclick="exportExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1">
                     <i class="fa-solid fa-file-excel"></i> Excel
                 </button>
-                <button onclick="printAll()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                <button onclick="printAll()" class="bg-gray-800 hover:bg-gray-900 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1">
                     <i class="fa-solid fa-print"></i> Print
                 </button>
-                <div class="h-8 w-px bg-gray-400/30 mx-1"></div>
-                <button onclick="resetAll()" class="bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2 border border-red-200" title="Factory Reset">
-                    <i class="fa-solid fa-trash-can"></i> Reset
+                <button onclick="resetAll()" class="bg-red-50 hover:bg-red-600 hover:text-white text-red-600 p-2 rounded-xl text-xs font-bold transition border border-red-200" title="Factory Reset">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                </button>
+                <div class="h-6 w-px bg-gray-300/60 mx-0.5"></div>
+
+                <!-- PROMINENT DEVELOPER & PAY UPI BUTTON -->
+                <button onclick="openDevModal()" class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:brightness-105 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-md transition flex items-center gap-1.5 border border-amber-300/40">
+                    <i class="fa-solid fa-crown text-amber-200"></i> Dev & Pay UPI
                 </button>
             </div>
         </nav>
@@ -285,7 +305,22 @@
                                 </div>
 
                                 <div><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1" id="lbl-name">Subject Name</label><input id="inName" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Full Title" required></div>
-                                <div><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1" id="lbl-fac">Faculty Name</label><input id="inFac" list="dl-fac" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Select Faculty"><datalist id="dl-fac"></datalist><p id="hint-fac" class="hidden text-[10px] text-gray-400 mt-1 italic pl-1">* Activities do not cause faculty clashes.</p></div>
+                                
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="col-span-2">
+                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1" id="lbl-fac">Faculty Name</label>
+                                        <input id="inFac" list="dl-fac" oninput="onFacInputChanged(this.value)" class="glass-input w-full p-3 rounded-xl text-sm font-medium" placeholder="Select Faculty">
+                                        <datalist id="dl-fac"></datalist>
+                                        <p id="hint-fac" class="hidden text-[10px] text-gray-400 mt-1 italic pl-1">* Activities do not cause faculty clashes.</p>
+                                    </div>
+                                    <div class="col-span-1" id="field-facCat">
+                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Category</label>
+                                        <select id="inFacCat" class="glass-input w-full p-3 rounded-xl text-xs font-bold text-gray-700">
+                                            <option value="OnRoll">On-Roll</option>
+                                            <option value="Visiting">Visiting</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 
                                 <div class="grid grid-cols-2 gap-3">
                                     <div id="field-hours"><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1">Hours/Week</label><input type="number" id="inHours" class="glass-input w-full p-3 rounded-xl text-sm font-bold" value="3" min="1"></div>
@@ -296,9 +331,28 @@
                             </form>
                         </div>
                         <div class="w-full lg:w-2/3 glass-panel p-0 rounded-3xl overflow-hidden flex flex-col">
-                            <div class="p-4 bg-white/40 border-b border-gray-200/50 flex justify-between items-center">
-                                <h3 class="font-bold text-gray-700 pl-2">Subjects Database</h3>
-                                <div class="relative"><i class="fa-solid fa-search absolute left-3 top-3 text-gray-400 text-xs"></i><input id="search" onkeyup="renderDB()" class="glass-input pl-9 pr-4 py-2 rounded-full text-xs w-64 shadow-sm" placeholder="Search..."></div>
+                            <div class="p-4 bg-white/40 border-b border-gray-200/50 flex flex-col gap-3">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                    <h3 class="font-bold text-gray-700 pl-2 flex items-center gap-2">
+                                        <i class="fa-solid fa-database text-indigo-500"></i> Subjects Database
+                                    </h3>
+                                    <div class="relative w-full sm:w-80">
+                                        <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-xs"></i>
+                                        <input id="search" onkeyup="renderDB()" class="glass-input pl-9 pr-8 py-2 rounded-full text-xs w-full shadow-sm" placeholder="Search room, faculty, code, subject, batch, category...">
+                                        <button id="searchClear" onclick="clearSearch()" class="hidden absolute right-3 top-2.5 text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-circle-xmark"></i></button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Filter Chips -->
+                                <div class="flex items-center gap-1.5 flex-wrap pl-2 pt-1 border-t border-gray-100 text-xs">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mr-1"><i class="fa-solid fa-filter"></i> Filter:</span>
+                                    <button onclick="setDbFilterChip('all')" id="chip-all" class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-600 text-white shadow-sm transition cursor-pointer">All</button>
+                                    <button onclick="setDbFilterChip('academic')" id="chip-academic" class="px-3 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition cursor-pointer">Academic</button>
+                                    <button onclick="setDbFilterChip('lab')" id="chip-lab" class="px-3 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition cursor-pointer">Labs</button>
+                                    <button onclick="setDbFilterChip('activity')" id="chip-activity" class="px-3 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition cursor-pointer">Activities</button>
+                                    <button onclick="setDbFilterChip('OnRoll')" id="chip-OnRoll" class="px-3 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition cursor-pointer">On-Roll</button>
+                                    <button onclick="setDbFilterChip('Visiting')" id="chip-Visiting" class="px-3 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition cursor-pointer">Visiting</button>
+                                </div>
                             </div>
                             <div class="flex-1 overflow-auto c-scroll">
                                 <table class="w-full text-sm text-left">
@@ -308,7 +362,10 @@
                                     <tbody id="dbTable" class="divide-y divide-gray-100/50 bg-white/30"></tbody>
                                 </table>
                             </div>
-                            <div class="p-2 bg-gray-50/50 text-center text-xs text-gray-400 font-medium" id="dbCount">0 Records Found</div>
+                            <div class="p-2 bg-gray-50/50 text-center text-xs text-gray-400 font-medium flex justify-between px-6" id="dbFooter">
+                                <span id="dbCount">0 Records Found</span>
+                                <span class="text-[10px] text-gray-400"><i class="fa-solid fa-keyboard mr-1"></i>Press <kbd class="bg-gray-200 px-1 py-0.5 rounded text-[9px]"> / </kbd> to Search</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -320,7 +377,23 @@
                     <div class="p-6 border-b border-gray-200/50 bg-white/30 rounded-t-3xl">
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Working Batch</label>
                         <select id="selBatch" onchange="loadBatch(this.value)" class="glass-input w-full mt-1 p-3 rounded-xl font-bold text-gray-800 outline-none"><option value="">Select Batch...</option></select>
-                        <button onclick="autoSchedule()" class="w-full mt-5 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-3 rounded-xl shadow-lg text-xs font-bold hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Schedule</button>
+                        
+                        <!-- Batch Completion Progress Bar -->
+                        <div id="batchProgressContainer" class="hidden mt-3 p-3 bg-white/60 rounded-xl border border-indigo-100 shadow-sm">
+                            <div class="flex justify-between text-[11px] font-bold text-gray-700 mb-1">
+                                <span>Batch Progress</span>
+                                <span id="batchProgressPercent" class="text-indigo-600">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                                <div id="batchProgressBar" class="bg-gradient-to-r from-indigo-500 to-violet-600 h-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-[9px] font-semibold text-gray-400 mt-1">
+                                <span id="batchScheduledSlots">0h scheduled</span>
+                                <span id="batchTotalSlots">0h required</span>
+                            </div>
+                        </div>
+
+                        <button onclick="autoSchedule()" class="w-full mt-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-3 rounded-xl shadow-lg text-xs font-bold hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Schedule</button>
                         <button onclick="resetBatch()" class="w-full mt-3 bg-red-50 text-red-600 border border-red-100 py-3 rounded-xl text-xs font-bold hover:bg-red-100 transition flex items-center justify-center gap-2"><i class="fa-solid fa-eraser"></i> Clear Schedule</button>
                     </div>
                     <div class="p-3 px-6 bg-indigo-50/50 border-b border-gray-100 flex justify-between text-xs font-bold text-indigo-900"><span>Subject Pool</span><span id="poolStatus" class="bg-indigo-100 px-2 py-0.5 rounded">0h Left</span></div>
@@ -333,9 +406,18 @@
 
             <!-- FACULTY VIEW -->
             <div id="view-faculty" class="hidden h-full flex flex-col p-4 overflow-auto c-scroll">
-                <div class="glass-panel p-5 rounded-2xl mb-8 max-w-5xl mx-auto w-full flex items-center gap-6 shadow-md">
-                    <label class="font-bold text-gray-700 text-lg">Select Faculty:</label>
-                    <select id="selFacView" onchange="loadFacultyView(this.value)" class="glass-input p-2.5 rounded-xl w-72 font-bold text-gray-800 outline-none"><option value="">Choose Name...</option></select>
+                <div class="glass-panel p-5 rounded-2xl mb-8 max-w-5xl mx-auto w-full flex flex-wrap items-center justify-between gap-4 shadow-md">
+                    <div class="flex items-center gap-4">
+                        <label class="font-bold text-gray-700 text-lg">Select Faculty:</label>
+                        <select id="selFacView" onchange="loadFacultyView(this.value)" class="glass-input p-2.5 rounded-xl w-72 font-bold text-gray-800 outline-none"><option value="">Choose Name...</option></select>
+                    </div>
+                    <div id="facCategoryBadgeContainer" class="hidden flex items-center gap-3 bg-indigo-50/70 px-4 py-2 rounded-xl border border-indigo-100">
+                        <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider"><i class="fa-solid fa-id-badge text-indigo-500 mr-1"></i> Faculty Category:</span>
+                        <select id="selFacCategoryEdit" onchange="changeSelectedFacultyCategory(this.value)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-extrabold text-indigo-900 border-indigo-200 outline-none cursor-pointer">
+                            <option value="OnRoll">On-Roll Faculty</option>
+                            <option value="Visiting">Visiting Faculty</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl"><div id="grid-fac" class="grid-wrapper"></div></div>
             </div>
@@ -351,13 +433,84 @@
 
             <!-- FREE FACULTY VIEW -->
             <div id="view-free" class="hidden h-full flex flex-col p-4 overflow-auto c-scroll">
-                <div class="glass-panel p-6 rounded-2xl mb-6 max-w-5xl mx-auto w-full text-center shadow-md">
-                    <h2 class="text-2xl font-bold text-indigo-900 mb-2 flex items-center justify-center gap-3"><i class="fa-solid fa-binoculars text-indigo-500"></i> Free Faculty Finder</h2>
-                    <p class="text-sm text-gray-500">Click on any green time slot to see teachers with no assigned class.</p>
+                <div class="glass-panel p-6 rounded-2xl mb-6 max-w-5xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-4 shadow-md">
+                    <div class="text-left">
+                        <h2 class="text-2xl font-bold text-indigo-900 mb-1 flex items-center gap-3"><i class="fa-solid fa-binoculars text-indigo-500"></i> Free Faculty Finder</h2>
+                        <p class="text-xs text-gray-500">Click on any green time slot to see teachers with no assigned class.</p>
+                    </div>
+                    
+                    <!-- Category Filter selector -->
+                    <div class="flex items-center gap-2 bg-indigo-50/80 p-1.5 rounded-2xl border border-indigo-100 shadow-inner">
+                        <span class="text-xs font-bold text-indigo-900 px-2 uppercase tracking-wider"><i class="fa-solid fa-filter text-indigo-500 mr-1"></i> Check:</span>
+                        <button onclick="setFreeFilter('all')" id="ff-btn-all" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-md">
+                            <i class="fa-solid fa-users"></i> Both (All)
+                        </button>
+                        <button onclick="setFreeFilter('OnRoll')" id="ff-btn-OnRoll" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-gray-600 hover:text-indigo-700 hover:bg-white/60">
+                            <i class="fa-solid fa-user-check"></i> On-Roll
+                        </button>
+                        <button onclick="setFreeFilter('Visiting')" id="ff-btn-Visiting" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-gray-600 hover:text-indigo-700 hover:bg-white/60">
+                            <i class="fa-solid fa-briefcase"></i> Visiting
+                        </button>
+                    </div>
                 </div>
                 <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl"><div id="grid-free" class="grid-wrapper"></div></div>
             </div>
+
+            <!-- DAY VIEW -->
+            <div id="view-day" class="hidden h-full flex flex-col p-2 overflow-hidden">
+                <!-- COMPACT INTEGRATED SINGLE-ROW TOOLBAR -->
+                <div class="glass-panel p-2 rounded-2xl mb-2 shrink-0 flex flex-wrap items-center justify-between gap-2 shadow-sm border border-indigo-100/80">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div class="flex bg-gray-100 p-1 rounded-xl gap-0.5 border border-gray-200 shadow-inner">
+                            <button onclick="selectDayView(0)" id="day-tab-0" class="px-3 py-1 rounded-lg text-xs font-extrabold transition bg-indigo-600 text-white shadow-xs">MON</button>
+                            <button onclick="selectDayView(1)" id="day-tab-1" class="px-3 py-1 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200">TUE</button>
+                            <button onclick="selectDayView(2)" id="day-tab-2" class="px-3 py-1 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200">WED</button>
+                            <button onclick="selectDayView(3)" id="day-tab-3" class="px-3 py-1 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200">THU</button>
+                            <button onclick="selectDayView(4)" id="day-tab-4" class="px-3 py-1 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200">FRI</button>
+                            <button onclick="selectDayView(5)" id="day-tab-5" class="px-3 py-1 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200">SAT</button>
+                        </div>
+                        
+                        <div class="flex bg-indigo-50/80 p-0.5 rounded-xl border border-indigo-100 text-xs">
+                            <button onclick="toggleDayViewMode('batch')" id="btn-dmode-batch" class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-indigo-600 text-white shadow-xs">
+                                <i class="fa-solid fa-layer-group"></i> By Batch
+                            </button>
+                            <button onclick="toggleDayViewMode('faculty')" id="btn-dmode-faculty" class="px-2.5 py-1 rounded-lg text-xs font-bold text-gray-600 hover:text-indigo-600">
+                                <i class="fa-solid fa-user-tie"></i> By Faculty
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div id="dayStatsInline" class="hidden md:flex items-center gap-2 text-[11px] font-bold text-gray-700 bg-white/90 px-3 py-1 rounded-xl border border-gray-200 shadow-2xs"></div>
+                        
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-gray-400 text-xs"></i>
+                            <input type="text" id="dayViewSearch" oninput="renderDayView()" placeholder="Filter faculty, class, room..." class="glass-input pl-7 pr-2.5 py-1 rounded-xl text-xs w-48 font-semibold">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN MATRIX CONTAINER - FULL HEIGHT AVAILABLE -->
+                <div id="dayGridContainer" class="flex-1 overflow-auto c-scroll rounded-2xl glass-panel shadow-md border border-white/60"></div>
+            </div>
         </div>
+
+        <!-- FOOTER BAR WITH DEVELOPER CREDIT & COMMERCIAL WARNING -->
+        <footer class="glass-panel mx-2 mb-2 p-2 px-4 rounded-xl flex flex-wrap justify-between items-center text-xs shrink-0 z-40 border border-indigo-900/40 bg-gray-900 text-white shadow-lg gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-extrabold text-amber-400 flex items-center gap-1.5"><i class="fa-solid fa-code"></i> Software Developed by Jitendra Prajapat</span>
+                <span class="text-gray-500">•</span>
+                <span class="text-gray-300 font-semibold"><i class="fa-solid fa-phone text-indigo-400"></i> Contact: <a href="tel:9664301637" class="underline hover:text-amber-300 font-bold">9664301637</a></span>
+            </div>
+            <div class="flex items-center gap-3 text-[11px] flex-wrap">
+                <span class="text-amber-300 font-bold bg-amber-950/80 px-2.5 py-0.5 rounded-lg border border-amber-700/60 flex items-center gap-1">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> WARNING: Commercial Use Requires Payment to Developer
+                </span>
+                <button onclick="openDevModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-white font-extrabold px-3 py-1 rounded-lg transition shadow-xs flex items-center gap-1">
+                    <i class="fa-solid fa-crown text-amber-200"></i> Pay / License (UPI)
+                </button>
+            </div>
+        </footer>
     </div>
 
     <!-- SETTINGS MODAL -->
@@ -434,12 +587,130 @@
 
     <!-- FREE FACULTY MODAL -->
     <div id="modalFree" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center">
-        <div class="glass-panel bg-white p-6 rounded-3xl w-[600px] max-h-[80vh] flex flex-col shadow-2xl">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
+        <div class="glass-panel bg-white p-6 rounded-3xl w-[650px] max-h-[85vh] flex flex-col shadow-2xl">
+            <div class="flex justify-between items-start mb-4 border-b border-gray-100 pb-4">
                 <div><h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i class="fa-solid fa-user-check text-green-500"></i> Available Faculty</h3><p class="text-xs text-gray-500 font-bold uppercase mt-1" id="freeSubtitle"></p></div>
-                <button onclick="document.getElementById('modalFree').classList.add('hidden')" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="document.getElementById('modalFree').classList.add('hidden')" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            
+            <!-- Category Filter bar inside Modal -->
+            <div class="flex items-center gap-2 bg-indigo-50/60 p-1.5 rounded-xl mb-4 border border-indigo-100 text-xs">
+                <span class="font-bold text-indigo-900 pl-2 uppercase tracking-wider text-[10px]">Filter:</span>
+                <button onclick="setFreeFilter('all')" id="mff-all" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm">Both (All)</button>
+                <button onclick="setFreeFilter('OnRoll')" id="mff-OnRoll" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200/60">On-Roll</button>
+                <button onclick="setFreeFilter('Visiting')" id="mff-Visiting" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200/60">Visiting</button>
+            </div>
+
             <div id="freeList" class="flex-1 overflow-y-auto c-scroll grid grid-cols-2 gap-3 p-1"></div>
+        </div>
+    <!-- FACULTY WORKLOAD ANALYTICS MODAL -->
+    <div id="modalWorkload" onclick="if(event.target===this) closeModal('modalWorkload')" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[75] flex items-center justify-center p-4">
+        <div class="glass-panel bg-white p-6 rounded-3xl w-[820px] max-h-[88vh] flex flex-col shadow-2xl border border-white/40">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                <div>
+                    <h3 class="text-xl font-extrabold text-indigo-950 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-indigo-600"></i> Faculty Workload Analytics & Breakdown
+                    </h3>
+                    <p class="text-xs text-gray-500 font-medium mt-0.5">Comprehensive overview of weekly target hours, scheduled slots, and workload categories per faculty member.</p>
+                </div>
+                <button onclick="closeModal('modalWorkload')" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div id="workloadList" class="flex-1 overflow-y-auto c-scroll space-y-3 p-1"></div>
+        </div>
+    </div>
+
+    <!-- DEVELOPER, COMMERCIAL LICENSE & UPI PAYMENT MODAL -->
+    <div id="modalDev" onclick="if(event.target===this) closeModal('modalDev')" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[85] flex items-center justify-center p-4">
+        <div class="glass-panel bg-white p-6 rounded-3xl w-[580px] max-h-[90vh] flex flex-col shadow-2xl border border-white/40 overflow-y-auto c-scroll">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-orange-500 text-white flex items-center justify-center text-xl font-black shadow-md">
+                        JP
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-gray-900">Jitendra Prajapat</h3>
+                        <p class="text-xs font-bold text-indigo-600">Software Developer & Architect • 📞 9664301637</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modalDev')" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs text-gray-700">
+                <!-- DEVELOPER CONTACT CARD -->
+                <div class="p-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-orange-50 rounded-2xl border border-indigo-100 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <div class="font-extrabold text-sm text-indigo-950">Direct Developer Contact</div>
+                        <div class="text-[11px] font-bold text-gray-600 mt-0.5">Phone / WhatsApp: <span class="text-indigo-700 font-extrabold">9664301637</span></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="tel:9664301637" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 shadow-xs">
+                            <i class="fa-solid fa-phone"></i> Call Developer
+                        </a>
+                        <a href="https://wa.me/919664301637" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 shadow-xs">
+                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </div>
+                </div>
+
+                <!-- COMMERCIAL LICENSE WARNING NOTICE -->
+                <div class="p-4 bg-red-50/90 rounded-2xl border border-red-200 text-red-950">
+                    <div class="font-extrabold text-xs flex items-center gap-2 text-red-900 uppercase tracking-wider mb-1">
+                        <i class="fa-solid fa-triangle-exclamation text-red-600 text-sm"></i> Commercial Use License Requirement & Warning
+                    </div>
+                    <p class="leading-relaxed font-medium">
+                        This University Class Scheduler software was designed and developed by <strong>Jitendra Prajapat</strong>.
+                    </p>
+                    <div class="mt-2 p-2.5 bg-red-100/90 rounded-xl font-extrabold text-red-900 border border-red-300">
+                        ⚠️ WARNING: To use this application commercially for any university, college, school, coaching institute, or organization, users MUST pay the developer (Jitendra Prajapat - 9664301637) to acquire a valid Commercial License. Unlicensed commercial usage is strictly prohibited.
+                    </div>
+                </div>
+
+                <!-- UPI PAYMENT SECTION -->
+                <div class="p-5 bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-950 text-white rounded-3xl shadow-xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Pay / Support Developer via UPI</div>
+                            <div class="text-base font-extrabold text-white">Jitendra Prajapat (9664301637)</div>
+                        </div>
+                        <span class="text-[10px] bg-white/10 px-2.5 py-1 rounded-full border border-white/20 font-bold">UPI ID: 9664301637@upi</span>
+                    </div>
+
+                    <!-- PRESET AMOUNT SELECTION -->
+                    <div class="text-[11px] font-bold text-gray-300 mb-2">Select Payment Amount (₹):</div>
+                    <div class="grid grid-cols-4 gap-2 mb-4">
+                        <button onclick="selectUpiAmount(50)" id="upi-amt-50" class="py-2 bg-white/10 hover:bg-white/20 rounded-xl font-extrabold text-xs border border-white/20 transition">₹50</button>
+                        <button onclick="selectUpiAmount(500)" id="upi-amt-500" class="py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-extrabold text-xs shadow-md border border-indigo-400 transition">₹500</button>
+                        <button onclick="selectUpiAmount(5000)" id="upi-amt-5000" class="py-2 bg-white/10 hover:bg-white/20 rounded-xl font-extrabold text-xs border border-white/20 transition">₹5,000</button>
+                        <button onclick="selectUpiAmount('custom')" id="upi-amt-custom" class="py-2 bg-white/10 hover:bg-white/20 rounded-xl font-extrabold text-xs border border-white/20 transition">Custom</button>
+                    </div>
+
+                    <!-- DYNAMIC CUSTOM INPUT -->
+                    <div id="customUpiBox" class="hidden mb-4">
+                        <input type="number" id="customUpiInput" oninput="updateUpiLink()" placeholder="Enter custom amount in ₹..." class="w-full p-2.5 rounded-xl bg-white/20 text-white font-bold placeholder-gray-400 outline-none border border-white/30 text-xs">
+                    </div>
+
+                    <!-- UPI ACTION BUTTONS -->
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <a id="btnPayUpiDeepLink" href="upi://pay?pa=9664301637@upi&pn=Jitendra%20Prajapat&am=500&cu=INR" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold rounded-xl text-center shadow-lg hover:brightness-110 transition flex items-center justify-center gap-2 text-xs">
+                            <i class="fa-solid fa-mobile-screen"></i> Pay via UPI App (GPay/PhonePe/Paytm)
+                        </a>
+                        <button onclick="copyUpiId()" class="px-4 py-3 bg-white/15 hover:bg-white/25 rounded-xl font-bold text-xs transition border border-white/20 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-copy"></i> Copy UPI ID
+                        </button>
+                    </div>
+
+                    <!-- LIVE QR CODE -->
+                    <div class="mt-4 pt-4 border-t border-white/10 text-center flex flex-col items-center">
+                        <div class="text-[10px] font-bold text-gray-300 uppercase mb-2">Scan QR Code using GPay, PhonePe, Paytm or BHIM</div>
+                        <img id="upiQrCodeImg" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi%3A%2F%2Fpay%3Fpa%3D9664301637%40upi%26pn%3DJitendra%2520Prajapat%26am%3D500%26cu%3DINR" alt="UPI QR Code" class="w-36 h-36 rounded-xl border-4 border-white shadow-md">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -459,7 +730,8 @@
         let app = {
             config: { onboarded: false, signatures: [] },
             subjects: [],
-            schedule: []
+            schedule: [],
+            faculties: {}
         };
         let editId = null;
 
@@ -467,6 +739,7 @@
             const saved = localStorage.getItem('uniSchedDynV12');
             if(saved) {
                 app = JSON.parse(saved);
+                if (!app.faculties) app.faculties = {};
                 
                 // MIGRATION: Convert old generic duration to the new array system smoothly
                 if (typeof app.config.pDur === 'number') {
@@ -474,10 +747,17 @@
                     delete app.config.pDur; 
                 }
 
-                // MIGRATION / REPAIR: Ensure all subjects have a spec field and standardize Labs
+                // MIGRATION / REPAIR: Ensure all subjects have a spec field and standardize Labs & Faculty Categories
                 app.subjects.forEach(s => {
                     s.spec = cleanStr(s.spec) || '';
                     if (s.type === 'Lab (2 Slots)' || s.type === 'Lab (1 Slot)') s.type = 'Lab';
+                    const f = cleanStr(s.fac);
+                    if (f && f !== 'Staff' && f !== 'TBA') {
+                        if (!app.faculties[f]) {
+                            app.faculties[f] = s.facCat || 'OnRoll';
+                        }
+                        s.facCat = app.faculties[f];
+                    }
                 });
                 
                 // Ensure legacy saves default to 2 slots for labs
@@ -728,6 +1008,79 @@
             return slots;
         }
 
+        function getPairedLabInfo(entity, type, day, slIdx) {
+            if (app.config.labSlots !== 2) return null;
+            let allocs = [];
+            if (type === 'Batch') {
+                allocs = app.schedule.filter(s => s.batch === entity && s.day === day && s.pIdx === slIdx);
+            } else if (type === 'Room') {
+                allocs = app.schedule.filter(s => { 
+                    const sub = app.subjects.find(x => x.id === s.sid); 
+                    return sub && cleanStr(sub.room) === entity && s.day === day && s.pIdx === slIdx; 
+                });
+            } else {
+                allocs = app.schedule.filter(s => { 
+                    const sub = app.subjects.find(x => x.id === s.sid); 
+                    return sub && cleanStr(sub.fac) === entity && s.day === day && s.pIdx === slIdx && !ACTIVITY_TYPES.includes(sub.type); 
+                });
+            }
+
+            if (allocs.length === 0) return null;
+
+            for (let alloc of allocs) {
+                const sub = app.subjects.find(x => x.id === alloc.sid);
+                if (sub && sub.type === 'Lab') {
+                    const nextAlloc = app.schedule.find(s => 
+                        s.sid === alloc.sid && 
+                        s.day === day && 
+                        s.pIdx === slIdx + 1 && 
+                        (type === 'Batch' ? s.batch === alloc.batch : true)
+                    );
+                    if (nextAlloc) {
+                        return { isFirst: true, alloc, sub, nextPIdx: slIdx + 1, allocs };
+                    }
+                    
+                    const prevAlloc = app.schedule.find(s => 
+                        s.sid === alloc.sid && 
+                        s.day === day && 
+                        s.pIdx === slIdx - 1 && 
+                        (type === 'Batch' ? s.batch === alloc.batch : true)
+                    );
+                    if (prevAlloc) {
+                        return { isSecond: true, alloc, sub, prevPIdx: slIdx - 1, allocs };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function getFacultyCategory(facName) {
+            const f = cleanStr(facName);
+            if (!f || f === 'Staff' || f === 'TBA') return 'OnRoll';
+            return (app.faculties && app.faculties[f]) ? app.faculties[f] : 'OnRoll';
+        }
+
+        function setFacultyCategory(facName, cat) {
+            const f = cleanStr(facName);
+            if (!f || f === 'Staff' || f === 'TBA') return;
+            if (!app.faculties) app.faculties = {};
+            app.faculties[f] = cat;
+            app.subjects.forEach(s => {
+                if (cleanStr(s.fac) === f) s.facCat = cat;
+            });
+            save();
+            refreshSelectors();
+            renderDB();
+        }
+
+        function onFacInputChanged(val) {
+            const f = cleanStr(val);
+            if (f && app.faculties && app.faculties[f]) {
+                const catEl = document.getElementById('inFacCat');
+                if (catEl) catEl.value = app.faculties[f];
+            }
+        }
+
         function saveSubject(e) {
             e.preventDefault();
             const mode = document.getElementById('entryMode').value;
@@ -735,13 +1088,22 @@
             let code = cleanStr(document.getElementById('inCode').value.toUpperCase());
             if(mode === 'activity' && !code) code = type.substr(0,3).toUpperCase() + '-' + Math.floor(Math.random()*100);
 
+            const facName = cleanStr(document.getElementById('inFac').value) || (mode==='activity' ? 'Staff' : 'TBA');
+            const facCat = document.getElementById('inFacCat') ? document.getElementById('inFacCat').value : 'OnRoll';
+
+            if (facName && facName !== 'Staff' && facName !== 'TBA') {
+                if (!app.faculties) app.faculties = {};
+                app.faculties[facName] = facCat;
+            }
+
             const form = {
                 batch: cleanStr(document.getElementById('inBatch').value.toUpperCase()),
                 code: code, 
                 name: document.getElementById('inName').value.trim(),
                 spec: mode === 'academic' ? cleanStr(document.getElementById('inSpec').value) : '',
                 room: document.getElementById('inRoom').value.trim(),
-                fac: cleanStr(document.getElementById('inFac').value) || (mode==='activity' ? 'Staff' : 'TBA'),
+                fac: facName,
+                facCat: facCat,
                 hrs: parseInt(document.getElementById('inHours').value), 
                 type: type
             };
@@ -764,6 +1126,7 @@
             document.getElementById('inBatch').value = s.batch; document.getElementById('inCode').value = s.code;
             document.getElementById('inName').value = s.name; document.getElementById('inSpec').value = s.spec || '';
             document.getElementById('inRoom').value = s.room || ''; document.getElementById('inFac').value = s.fac; 
+            if(document.getElementById('inFacCat')) document.getElementById('inFacCat').value = getFacultyCategory(s.fac);
             document.getElementById('inHours').value = s.hrs; document.getElementById('inType').value = s.type; 
             editId = id;
             document.getElementById('saveBtn').innerHTML = 'Update Details'; document.getElementById('cancelBtn').classList.remove('hidden');
@@ -772,9 +1135,74 @@
         function resetForm() { document.getElementById('form').reset(); editId = null; setTab('academic'); document.getElementById('saveBtn').innerHTML = 'Save'; document.getElementById('cancelBtn').classList.add('hidden'); }
         function deleteSubject(id) { if(confirm("Are you sure?")) { app.subjects = app.subjects.filter(s => s.id !== id); app.schedule = app.schedule.filter(s => s.sid !== id); save(); refreshSelectors(); renderDB(); const b = document.getElementById('selBatch').value; if(b) loadBatch(b); toast('Deleted', 'Removed.'); } }
 
+        let dbFilterChip = 'all';
+
+        function setDbFilterChip(chip) {
+            dbFilterChip = chip;
+            ['all', 'academic', 'lab', 'activity', 'OnRoll', 'Visiting'].forEach(c => {
+                const el = document.getElementById('chip-' + c);
+                if(el) {
+                    if(c === chip) {
+                        el.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-600 text-white shadow-sm transition cursor-pointer";
+                    } else {
+                        el.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition cursor-pointer";
+                    }
+                }
+            });
+            renderDB();
+        }
+
+        function clearSearch() {
+            const el = document.getElementById('search');
+            if(el) { el.value = ''; renderDB(); el.focus(); }
+        }
+
+        function cloneSubject(id) {
+            const s = app.subjects.find(x => x.id === id);
+            if (!s) return;
+            const cloned = {
+                ...s,
+                id: Math.random().toString(36).substr(2),
+                code: s.code ? s.code + '-COPY' : 'COPY-01',
+                name: s.name + ' (Copy)'
+            };
+            app.subjects.push(cloned);
+            save();
+            refreshSelectors();
+            renderDB();
+            toast('Cloned', `Created duplicate of ${s.code || s.name}.`);
+        }
+
         function renderDB() {
-            const q = document.getElementById('search').value.toLowerCase();
-            document.getElementById('dbTable').innerHTML = app.subjects.filter(s => !q || s.batch.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)).map(s => `
+            const q = document.getElementById('search').value.trim().toLowerCase();
+            const clearBtn = document.getElementById('searchClear');
+            if(clearBtn) clearBtn.classList.toggle('hidden', !q);
+
+            const filtered = app.subjects.filter(s => {
+                // Filter chip check
+                if (dbFilterChip === 'academic' && ACTIVITY_TYPES.includes(s.type)) return false;
+                if (dbFilterChip === 'lab' && s.type !== 'Lab') return false;
+                if (dbFilterChip === 'activity' && !ACTIVITY_TYPES.includes(s.type)) return false;
+                if (dbFilterChip === 'OnRoll' && (ACTIVITY_TYPES.includes(s.type) || getFacultyCategory(s.fac) !== 'OnRoll')) return false;
+                if (dbFilterChip === 'Visiting' && (ACTIVITY_TYPES.includes(s.type) || getFacultyCategory(s.fac) !== 'Visiting')) return false;
+
+                // Search query check across ALL fields
+                if (!q) return true;
+                const facCat = getFacultyCategory(s.fac).toLowerCase();
+                const facCatLabel = facCat === 'visiting' ? 'visiting' : 'on-roll onroll';
+                
+                return (s.batch && s.batch.toLowerCase().includes(q)) ||
+                       (s.code && s.code.toLowerCase().includes(q)) ||
+                       (s.name && s.name.toLowerCase().includes(q)) ||
+                       (s.room && s.room.toLowerCase().includes(q)) ||
+                       (s.fac && s.fac.toLowerCase().includes(q)) ||
+                       (s.spec && s.spec.toLowerCase().includes(q)) ||
+                       (s.type && s.type.toLowerCase().includes(q)) ||
+                       (s.hrs && String(s.hrs).includes(q)) ||
+                       facCatLabel.includes(q);
+            });
+
+            document.getElementById('dbTable').innerHTML = filtered.map(s => `
                 <tr class="hover:bg-indigo-50/40 group transition-colors">
                     <td class="px-6 py-4 font-bold text-gray-700">${s.batch}</td>
                     <td class="px-6 py-4 font-mono text-indigo-600 font-bold">${s.code}</td>
@@ -783,25 +1211,301 @@
                         ${ACTIVITY_TYPES.includes(s.type) ? '<span class="ml-2 text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded border border-yellow-200">Activity</span>' : ''}
                     </td>
                     <td class="px-6 py-4 font-bold text-xs">${s.room || '-'}</td>
-                    <td class="px-6 py-4 text-xs text-gray-600">${s.fac}</td>
-                    <td class="px-6 py-4 text-right">
-                        <button onclick="editSubject('${s.id}')" class="text-indigo-500 hover:text-indigo-700 bg-white p-2 rounded-lg shadow-sm mx-1"><i class="fa-solid fa-pencil"></i></button>
-                        <button onclick="deleteSubject('${s.id}')" class="text-red-400 hover:text-red-600 bg-white p-2 rounded-lg shadow-sm mx-1"><i class="fa-solid fa-trash-can"></i></button>
+                    <td class="px-6 py-4 text-xs text-gray-600">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="font-bold">${s.fac}</span>
+                            ${!ACTIVITY_TYPES.includes(s.type) && s.fac && s.fac !== 'Staff' && s.fac !== 'TBA' ? 
+                                `<span class="text-[9px] px-1.5 py-0.5 rounded font-extrabold ${getFacultyCategory(s.fac)==='Visiting' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-100 text-blue-800 border border-blue-200'}">
+                                    ${getFacultyCategory(s.fac)==='Visiting' ? 'Visiting' : 'On-Roll'}
+                                </span>` : ''}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-right whitespace-nowrap">
+                        <button onclick="cloneSubject('${s.id}')" class="text-emerald-500 hover:text-emerald-700 bg-white p-2 rounded-lg shadow-sm mx-1" title="Duplicate Subject"><i class="fa-solid fa-copy"></i></button>
+                        <button onclick="editSubject('${s.id}')" class="text-indigo-500 hover:text-indigo-700 bg-white p-2 rounded-lg shadow-sm mx-1" title="Edit Subject"><i class="fa-solid fa-pencil"></i></button>
+                        <button onclick="deleteSubject('${s.id}')" class="text-red-400 hover:text-red-600 bg-white p-2 rounded-lg shadow-sm mx-1" title="Delete Subject"><i class="fa-solid fa-trash-can"></i></button>
                     </td>
                 </tr>`).join('');
-            document.getElementById('dbCount').innerText = `${document.getElementById('dbTable').children.length} Records Found`;
+            document.getElementById('dbCount').innerText = `${filtered.length} of ${app.subjects.length} Records Shown`;
         }
 
-        function getAcademicFaculty() { return [...new Set(app.subjects.filter(s => !ACTIVITY_TYPES.includes(s.type)).map(s => cleanStr(s.fac)))].sort(); }
+        let workloadFilter = 'all';
+        let workloadSearchQuery = '';
+
+        function setWorkloadFilter(cat) {
+            workloadFilter = cat;
+            renderWorkloadModal();
+        }
+
+        function openWorkloadModal() {
+            renderWorkloadModal();
+            document.getElementById('modalWorkload').classList.remove('hidden');
+        }
+
+        function renderWorkloadModal() {
+            const list = getAcademicFaculty();
+            const container = document.getElementById('workloadList');
+            if(!container) return;
+            
+            if(list.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-400 italic py-8">No academic faculty members added yet.</div>`;
+                return;
+            }
+
+            let totalFaculty = list.length;
+            let totalRequiredHoursAll = 0;
+            let totalScheduledSlotsAll = 0;
+            let highWorkloadCount = 0;
+            let underloadedCount = 0;
+
+            const facultyStats = list.map(f => {
+                const cleanF = cleanStr(f);
+                const cat = getFacultyCategory(cleanF);
+                const facSubs = app.subjects.filter(s => cleanStr(s.fac) === cleanF && !ACTIVITY_TYPES.includes(s.type));
+                const totalReqHrs = facSubs.reduce((sum, s) => sum + (s.hrs || 0), 0);
+                
+                const scheduledAllocs = app.schedule.filter(s => {
+                    const sub = app.subjects.find(x => x.id === s.sid);
+                    return sub && cleanStr(sub.fac) === cleanF && !ACTIVITY_TYPES.includes(sub.type);
+                });
+                const scheduledSlotsCount = scheduledAllocs.length;
+
+                const lectureHrs = facSubs.filter(s => s.type === 'Lecture').reduce((sum, s) => sum + (s.hrs || 0), 0);
+                const labHrs = facSubs.filter(s => s.type === 'Lab').reduce((sum, s) => sum + (s.hrs || 0), 0);
+
+                totalRequiredHoursAll += totalReqHrs;
+                totalScheduledSlotsAll += scheduledSlotsCount;
+
+                let statusKey = 'optimal';
+                if(totalReqHrs > 18) { statusKey = 'high'; highWorkloadCount++; }
+                else if(totalReqHrs < 6) { statusKey = 'light'; underloadedCount++; }
+
+                return {
+                    name: f,
+                    cat,
+                    facSubs,
+                    totalReqHrs,
+                    scheduledSlotsCount,
+                    lectureHrs,
+                    labHrs,
+                    statusKey
+                };
+            });
+
+            // Filter & Search
+            const search = (workloadSearchQuery || '').toLowerCase().trim();
+            const filteredStats = facultyStats.filter(item => {
+                if (workloadFilter === 'OnRoll' && item.cat !== 'OnRoll') return false;
+                if (workloadFilter === 'Visiting' && item.cat !== 'Visiting') return false;
+                if (workloadFilter === 'high' && item.statusKey !== 'high') return false;
+                if (workloadFilter === 'light' && item.statusKey !== 'light') return false;
+                if (workloadFilter === 'optimal' && item.statusKey !== 'optimal') return false;
+
+                if (search) {
+                    const matchesName = item.name.toLowerCase().includes(search);
+                    const matchesSub = item.facSubs.some(s => s.code.toLowerCase().includes(search) || s.name.toLowerCase().includes(search) || s.batch.toLowerCase().includes(search));
+                    if (!matchesName && !matchesSub) return false;
+                }
+                return true;
+            });
+
+            let html = `
+            <div class="grid grid-cols-4 gap-3 mb-4">
+                <div class="bg-indigo-50/80 p-3 rounded-2xl border border-indigo-100 text-center shadow-2xs">
+                    <div class="text-[10px] font-extrabold text-indigo-500 uppercase">Total Faculty</div>
+                    <div class="text-xl font-extrabold text-indigo-900">${totalFaculty}</div>
+                </div>
+                <div class="bg-blue-50/80 p-3 rounded-2xl border border-blue-100 text-center shadow-2xs">
+                    <div class="text-[10px] font-extrabold text-blue-500 uppercase">Target Hours/Wk</div>
+                    <div class="text-xl font-extrabold text-blue-900">${totalRequiredHoursAll}h</div>
+                </div>
+                <div class="bg-emerald-50/80 p-3 rounded-2xl border border-emerald-100 text-center shadow-2xs">
+                    <div class="text-[10px] font-extrabold text-emerald-500 uppercase">Scheduled Slots</div>
+                    <div class="text-xl font-extrabold text-emerald-900">${totalScheduledSlotsAll} / ${totalRequiredHoursAll}</div>
+                </div>
+                <div class="bg-amber-50/80 p-3 rounded-2xl border border-amber-100 text-center shadow-2xs">
+                    <div class="text-[10px] font-extrabold text-amber-600 uppercase">High Workload (>18h)</div>
+                    <div class="text-xl font-extrabold text-amber-900">${highWorkloadCount}</div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-3 bg-gray-50 p-2.5 rounded-2xl border border-gray-200">
+                <div class="flex gap-1 flex-wrap">
+                    <button onclick="setWorkloadFilter('all')" class="px-3 py-1 rounded-xl text-xs font-bold transition ${workloadFilter==='all'?'bg-indigo-600 text-white shadow-sm':'text-gray-600 hover:bg-gray-200'}">All (${totalFaculty})</button>
+                    <button onclick="setWorkloadFilter('OnRoll')" class="px-3 py-1 rounded-xl text-xs font-bold transition ${workloadFilter==='OnRoll'?'bg-indigo-600 text-white shadow-sm':'text-gray-600 hover:bg-gray-200'}">On-Roll</button>
+                    <button onclick="setWorkloadFilter('Visiting')" class="px-3 py-1 rounded-xl text-xs font-bold transition ${workloadFilter==='Visiting'?'bg-amber-600 text-white shadow-sm':'text-gray-600 hover:bg-gray-200'}">Visiting</button>
+                    <button onclick="setWorkloadFilter('high')" class="px-3 py-1 rounded-xl text-xs font-bold transition ${workloadFilter==='high'?'bg-red-600 text-white shadow-sm':'text-gray-600 hover:bg-gray-200'}">High Workload (>18h)</button>
+                    <button onclick="setWorkloadFilter('light')" class="px-3 py-1 rounded-xl text-xs font-bold transition ${workloadFilter==='light'?'bg-blue-600 text-white shadow-sm':'text-gray-600 hover:bg-gray-200'}">Light Load</button>
+                </div>
+                <input type="text" placeholder="Search faculty/subject..." value="${workloadSearchQuery}" oninput="workloadSearchQuery=this.value; renderWorkloadModal();" class="glass-input px-3 py-1 rounded-xl text-xs w-48 font-medium">
+            </div>
+
+            <div class="space-y-3 max-h-[50vh] overflow-y-auto c-scroll pr-1">
+            `;
+
+            if (filteredStats.length === 0) {
+                html += `<div class="text-center text-gray-400 italic py-8">No faculty members match the filter criteria.</div>`;
+            } else {
+                filteredStats.forEach(st => {
+                    const catBadge = st.cat === 'Visiting' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                    
+                    let loadBadge = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                    let loadText = 'Optimal Load';
+                    if (st.statusKey === 'high') {
+                        loadBadge = 'bg-red-100 text-red-800 border-red-200';
+                        loadText = 'High Workload (>18h)';
+                    } else if (st.statusKey === 'light') {
+                        loadBadge = 'bg-blue-100 text-blue-800 border-blue-200';
+                        loadText = 'Light Load (<6h)';
+                    }
+
+                    const pct = st.totalReqHrs > 0 ? Math.min(100, Math.round((st.scheduledSlotsCount / st.totalReqHrs) * 100)) : 0;
+
+                    html += `
+                    <div class="p-4 bg-gray-50/90 rounded-2xl border border-gray-200 hover:border-indigo-300 transition shadow-sm">
+                        <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white font-extrabold flex items-center justify-center text-sm shadow-md">${st.name.charAt(0)}</div>
+                                <div>
+                                    <span class="font-extrabold text-sm text-gray-800">${st.name}</span>
+                                    <span class="ml-2 text-[10px] px-2 py-0.5 rounded-full border ${catBadge} font-extrabold">${st.cat === 'Visiting' ? 'Visiting' : 'On-Roll'}</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] px-2.5 py-1 rounded-full border ${loadBadge} font-extrabold">${loadText}</span>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2 text-center bg-white p-2.5 rounded-xl border border-gray-100 text-xs mb-2">
+                            <div>
+                                <div class="text-[9px] text-gray-400 font-bold uppercase">Subjects</div>
+                                <div class="font-extrabold text-gray-700">${st.facSubs.length}</div>
+                            </div>
+                            <div>
+                                <div class="text-[9px] text-gray-400 font-bold uppercase">Target Hours</div>
+                                <div class="font-extrabold text-indigo-600">${st.totalReqHrs} hrs</div>
+                            </div>
+                            <div>
+                                <div class="text-[9px] text-gray-400 font-bold uppercase">Lectures / Labs</div>
+                                <div class="font-bold text-gray-600">${st.lectureHrs}h / ${st.labHrs}h</div>
+                            </div>
+                            <div>
+                                <div class="text-[9px] text-gray-400 font-bold uppercase">Scheduled Progress</div>
+                                <div class="font-extrabold text-emerald-600">${st.scheduledSlotsCount} / ${st.totalReqHrs} (${pct}%)</div>
+                            </div>
+                        </div>
+
+                        <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-2">
+                            <div class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full rounded-full" style="width: ${pct}%"></div>
+                        </div>
+
+                        ${st.facSubs.length > 0 ? `
+                        <div class="mt-2 pt-2 border-t border-gray-200/60">
+                            <div class="text-[9.5px] font-extrabold text-gray-500 uppercase mb-1">Assigned Subjects Breakdown:</div>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${st.facSubs.map(sub => `
+                                    <span class="bg-white text-gray-700 text-[10px] font-bold px-2 py-1 rounded-lg border border-gray-200 flex items-center gap-1 shadow-2xs">
+                                        <span class="text-indigo-600 font-extrabold">${sub.code}</span> (${sub.batch}) - ${sub.hrs}h [${sub.type}] ${sub.room ? `<span class="text-gray-400 font-normal">rm:${sub.room}</span>`:''}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    `;
+                });
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
+                e.preventDefault();
+                switchView('data');
+                const searchInput = document.getElementById('search');
+                if(searchInput) searchInput.focus();
+            }
+            if (e.key === 'Escape') {
+                ['modalConfig', 'modalFree', 'modalWorkload', 'modalDev'].forEach(m => {
+                    const el = document.getElementById(m);
+                    if(el) el.classList.add('hidden');
+                });
+            }
+        });
+
+        let freeFacFilter = 'all';
+        let currentFreeDay = null;
+        let currentFreeSlot = null;
+        let currentFreeLabel = '';
+
+        function getAcademicFaculty(categoryFilter = 'all') { 
+            const list = [...new Set(app.subjects.filter(s => !ACTIVITY_TYPES.includes(s.type)).map(s => cleanStr(s.fac)))].filter(Boolean).sort(); 
+            if (!categoryFilter || categoryFilter === 'all') return list;
+            return list.filter(f => getFacultyCategory(f) === categoryFilter);
+        }
         function getRooms() { return [...new Set(app.subjects.map(s => cleanStr(s.room)).filter(Boolean))].sort(); }
         function getSpecs() { return [...new Set(app.subjects.map(s => cleanStr(s.spec)).filter(Boolean))].sort(); }
 
+        function setFreeFilter(cat) {
+            freeFacFilter = cat;
+            ['all', 'OnRoll', 'Visiting'].forEach(c => {
+                const btn = document.getElementById('ff-btn-' + c);
+                if (btn) {
+                    if (c === cat) {
+                        btn.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-md";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-gray-600 hover:text-indigo-700 hover:bg-white/60";
+                    }
+                }
+                const mBtn = document.getElementById('mff-' + c);
+                if (mBtn) {
+                    if (c === cat) {
+                        mBtn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm";
+                    } else {
+                        mBtn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200/60";
+                    }
+                }
+            });
+            renderGrid('grid-free', null, 'free');
+            if (currentFreeDay !== null && !document.getElementById('modalFree').classList.contains('hidden')) {
+                showFreeFac(currentFreeDay, currentFreeSlot, currentFreeLabel);
+            }
+        }
+
         function showFreeFac(d, p, label) {
-            const allFac = getAcademicFaculty();
+            currentFreeDay = d;
+            currentFreeSlot = p;
+            currentFreeLabel = label;
+
+            const filteredFac = getAcademicFaculty(freeFacFilter);
             const busyFac = new Set(app.schedule.filter(s => s.day === d && s.pIdx === p).map(s => { const sb = app.subjects.find(x => x.id === s.sid); return (sb && !ACTIVITY_TYPES.includes(sb.type)) ? cleanStr(sb.fac) : null; }).filter(Boolean));
-            const freeList = allFac.filter(f => !busyFac.has(f));
-            document.getElementById('freeSubtitle').innerText = `${DAYS[d]} | ${label}`;
-            document.getElementById('freeList').innerHTML = freeList.length > 0 ? freeList.map(f => `<div class="p-3 bg-green-50 text-green-800 font-bold text-xs rounded-xl border border-green-100 flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> ${f}</div>`).join('') : `<div class="col-span-2 text-center text-gray-400 italic py-4">All academic faculty members are busy!</div>`;
+            const freeList = filteredFac.filter(f => !busyFac.has(f));
+            
+            const catLabel = freeFacFilter === 'all' ? 'All (On-Roll & Visiting)' : (freeFacFilter === 'OnRoll' ? 'On-Roll Faculty Only' : 'Visiting Faculty Only');
+            document.getElementById('freeSubtitle').innerText = `${DAYS[d]} | ${label} • [${catLabel}]`;
+            
+            ['all', 'OnRoll', 'Visiting'].forEach(c => {
+                const mBtn = document.getElementById('mff-' + c);
+                if (mBtn) {
+                    mBtn.className = c === freeFacFilter ? "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm" : "px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200/60";
+                }
+            });
+
+            document.getElementById('freeList').innerHTML = freeList.length > 0 ? freeList.map(f => {
+                const cat = getFacultyCategory(f);
+                const badgeClass = cat === 'Visiting' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-blue-100 text-blue-800 border-blue-200';
+                const badgeIcon = cat === 'Visiting' ? 'fa-briefcase' : 'fa-user-check';
+                const badgeText = cat === 'Visiting' ? 'Visiting' : 'On-Roll';
+                return `<div class="p-3 bg-green-50 text-green-800 font-bold text-xs rounded-xl border border-green-100 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle text-green-600 text-sm"></i> 
+                        <span>${f}</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full border ${badgeClass} font-extrabold flex items-center gap-1">
+                        <i class="fa-solid ${badgeIcon}"></i> ${badgeText}
+                    </span>
+                </div>`;
+            }).join('') : `<div class="col-span-2 text-center text-gray-400 italic py-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">No free faculty members available in this category for this slot.</div>`;
             document.getElementById('modalFree').classList.remove('hidden');
         }
 
@@ -832,50 +1536,105 @@
                     
                     DAYS.forEach((_, day) => {
                         if(mode === 'free') {
-                            const allFac = getAcademicFaculty(); 
-                            const busyFac = new Set(app.schedule.filter(s => s.day === day && s.pIdx === sl.idx).map(s => { const sb = app.subjects.find(x => x.id === s.sid); return (sb && !ACTIVITY_TYPES.includes(sb.type)) ? cleanStr(sb.fac) : null; }).filter(Boolean));
-                            html += `<div onclick="showFreeFac(${day}, ${sl.idx}, '${sl.label}')" class="grid-cell justify-center items-center cursor-pointer hover:bg-green-50 transition border border-transparent hover:border-green-200"><div class="text-2xl font-bold text-green-600">${allFac.length - busyFac.size}</div><div class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Available</div></div>`;
+                            const filteredFac = getAcademicFaculty(freeFacFilter); 
+                            const busyFac = new Set(app.schedule.filter(s => s.day === day && s.pIdx === sl.idx).map(s => { 
+                                const sb = app.subjects.find(x => x.id === s.sid); 
+                                if (!sb || ACTIVITY_TYPES.includes(sb.type)) return null;
+                                const facName = cleanStr(sb.fac);
+                                if (freeFacFilter !== 'all' && getFacultyCategory(facName) !== freeFacFilter) return null;
+                                return facName; 
+                            }).filter(Boolean));
+                            
+                            const freeCount = Math.max(0, filteredFac.length - busyFac.size);
+                            html += `<div onclick="showFreeFac(${day}, ${sl.idx}, '${sl.label}')" class="grid-cell justify-center items-center cursor-pointer hover:bg-green-50 transition border border-transparent hover:border-green-200"><div class="text-2xl font-bold text-green-600">${freeCount}</div><div class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Available</div></div>`;
                         } else {
-                            // Fetch all allocations for this slot using filter() to support concurrent specializations
-                            let allocs = [];
-                            if(mode === 'batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === day && s.pIdx === sl.idx);
-                            else if (mode === 'room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx; });
-                            else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
-
+                            const gridType = mode === 'batch' ? 'Batch' : mode === 'room' ? 'Room' : 'Faculty';
+                            const labInfo = getPairedLabInfo(entity, gridType, day, sl.idx);
                             const dropAttrs = mode === 'batch' ? `ondragover="event.preventDefault(); this.classList.add('drag-active')" ondragleave="this.classList.remove('drag-active')" ondrop="handleDrop(event, ${day}, ${sl.idx}, '${entity}')"` : '';
 
-                            if(allocs.length > 0) {
-                                html += `<div class="grid-cell p-0.5 flex flex-col gap-0.5 transition-colors group relative overflow-y-auto c-scroll" ${dropAttrs}>`;
-                                allocs.forEach(alloc => {
-                                    const sub = app.subjects.find(s => s.id === alloc.sid);
-                                    if(!sub) return;
-                                    const isAct = ACTIVITY_TYPES.includes(sub.type);
-                                    const color = stringColor(sub.name);
-                                    
-                                    const dragAttrs = mode === 'batch' ? `draggable="true" ondragstart="event.dataTransfer.setData('reschedule', JSON.stringify({batch: '${alloc.batch}', day: ${day}, pIdx: ${sl.idx}, sid: '${alloc.sid}'})); event.stopPropagation();"` : '';
-
-                                    // Compact rendering if multiple
-                                    html += `<div class="p-1 group/item relative hover:brightness-95 transition scheduled-item shadow-sm rounded-sm shrink-0 border border-transparent hover:border-gray-300 bg-white" ${dragAttrs} style="border-left: 3px solid ${color}; min-height: 40px; display:flex; flex-direction:column; justify-content:center;">
-                                            <div class="flex justify-between items-start">
-                                                <div class="font-bold text-[10px] text-gray-800 leading-tight">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</div>
-                                                ${sub.spec ? `<div class="text-[8px] bg-blue-100 text-blue-700 px-1 rounded ml-1 truncate max-w-[40px]">${sub.spec}</div>` : ''}
-                                            </div>
-                                            <div class="text-[9px] leading-tight text-gray-600 my-0.5 line-clamp-1">${sub.name}</div>
-                                            <div class="text-[8px] font-bold text-gray-400 uppercase tracking-tight">${mode==='batch' ? sub.fac : mode==='room' ? sub.fac : (sub.room || 'N/A')}</div>
-                                            ${mode==='batch' && sub.room ? `<div class="text-[8px] text-indigo-600 font-bold"><i class="fa-solid fa-door-open"></i> ${sub.room}</div>` : ''}
-                                            ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx}, '${sub.id}')" class="absolute top-0 right-0 p-1 text-red-400 opacity-0 group-hover/item:opacity-100 hover:text-red-600 transition z-10"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
-                                        </div>`;
-                                });
-                                html += `</div>`;
+                            if (labInfo && labInfo.isFirst) {
+                                const sub = labInfo.sub;
+                                const alloc = labInfo.alloc;
+                                const dragAttrs = mode === 'batch' ? `draggable="true" ondragstart="event.dataTransfer.setData('reschedule', JSON.stringify({batch: '${alloc.batch}', day: ${day}, pIdx: ${sl.idx}, sid: '${alloc.sid}'})); event.stopPropagation();"` : '';
+                                
+                                html += `<div class="grid-cell p-0.5 flex flex-col transition-all group relative bg-gradient-to-b from-purple-100/90 via-purple-50/80 to-indigo-50/70 border-2 border-purple-400 rounded-t-xl border-b-0 shadow-md z-10" ${dropAttrs}>
+                                    <div class="p-1.5 group/item relative hover:brightness-95 transition scheduled-item rounded-lg bg-white/90 border border-purple-200 shadow-sm h-full flex flex-col justify-between" ${dragAttrs}>
+                                        <div class="flex justify-between items-center pb-0.5 border-b border-purple-100">
+                                            <span class="text-[8.5px] bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold px-1.5 py-0.5 rounded-full shadow-2xs flex items-center gap-1">
+                                                <i class="fa-solid fa-flask text-[9px]"></i> 2-SLOT LAB (1/2)
+                                            </span>
+                                            <span class="font-extrabold text-[10px] text-purple-900">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</span>
+                                        </div>
+                                        <div class="text-[9.5px] font-extrabold text-gray-900 my-0.5 line-clamp-1">${sub.name} ${sub.spec ? `<span class="text-[8px] bg-blue-100 text-blue-700 px-1 rounded ml-1">${sub.spec}</span>` : ''}</div>
+                                        <div class="text-[8.5px] font-bold text-purple-800 uppercase tracking-tight flex justify-between items-center pt-0.5 border-t border-purple-50">
+                                            <span><i class="fa-solid fa-user-tie text-purple-600"></i> ${mode==='batch' ? sub.fac : (sub.room || 'N/A')}</span>
+                                            ${mode==='batch' && sub.room ? `<span class="text-indigo-600 font-extrabold"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                        </div>
+                                        <div class="mt-0.5 text-[7.5px] font-extrabold text-purple-600 flex items-center justify-center gap-1 bg-purple-100/80 py-0.5 rounded">
+                                            <i class="fa-solid fa-arrows-up-down text-[7px]"></i> CONTINUOUS LAB SESSION
+                                        </div>
+                                        ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx}, '${sub.id}')" class="absolute top-1 right-1 p-0.5 text-red-400 opacity-0 group-hover/item:opacity-100 hover:text-red-600 transition z-10" title="Remove 2-Slot Lab"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
+                                    </div>
+                                </div>`;
+                            } else if (labInfo && labInfo.isSecond) {
+                                const sub = labInfo.sub;
+                                const alloc = labInfo.alloc;
+                                html += `<div class="grid-cell p-0.5 flex flex-col transition-all group relative bg-gradient-to-b from-indigo-50/70 via-purple-50/80 to-purple-100/90 border-2 border-purple-400 rounded-b-xl border-t-0 shadow-md z-10 -mt-px" ${dropAttrs}>
+                                    <div class="p-1.5 group/item relative hover:brightness-95 transition scheduled-item rounded-lg bg-white/90 border border-purple-200 shadow-sm h-full flex flex-col justify-between">
+                                        <div class="flex justify-between items-center pb-0.5 border-b border-purple-100">
+                                            <span class="text-[8.5px] bg-purple-200 text-purple-800 font-extrabold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                                <i class="fa-solid fa-link text-purple-600 text-[9px]"></i> LAB (SLOT 2/2)
+                                            </span>
+                                            <span class="font-extrabold text-[10px] text-purple-900">${sub.code}</span>
+                                        </div>
+                                        <div class="text-[9.5px] font-extrabold text-gray-900 my-0.5 line-clamp-1">${sub.name}</div>
+                                        <div class="text-[8.5px] font-bold text-purple-800 uppercase tracking-tight flex justify-between items-center pt-0.5 border-t border-purple-50">
+                                            <span><i class="fa-solid fa-user-tie text-purple-600"></i> ${mode==='batch' ? sub.fac : (sub.room || 'N/A')}</span>
+                                            ${mode==='batch' && sub.room ? `<span class="text-indigo-600 font-extrabold"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                        </div>
+                                        ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx-1}, '${sub.id}')" class="absolute top-1 right-1 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 transition z-10" title="Remove 2-Slot Lab"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
+                                    </div>
+                                </div>`;
                             } else {
-                                if(mode === 'batch') {
-                                    html += `<div class="grid-cell hover:bg-indigo-50/50 transition-colors group relative" ${dropAttrs}>
-                                        <button onclick="promptQuickActivity(${day}, ${sl.idx}, '${entity}')" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-white/50 text-indigo-400 hover:text-indigo-600 text-[10px] font-bold transition rounded shadow-inner">
-                                            + Add Activity
-                                        </button>
-                                    </div>`;
+                                // Fetch all allocations for this slot using filter() to support concurrent specializations
+                                let allocs = [];
+                                if(mode === 'batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === day && s.pIdx === sl.idx);
+                                else if (mode === 'room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx; });
+                                else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
+
+                                if(allocs.length > 0) {
+                                    html += `<div class="grid-cell p-0.5 flex flex-col gap-0.5 transition-colors group relative overflow-y-auto c-scroll" ${dropAttrs}>`;
+                                    allocs.forEach(alloc => {
+                                        const sub = app.subjects.find(s => s.id === alloc.sid);
+                                        if(!sub) return;
+                                        const isAct = ACTIVITY_TYPES.includes(sub.type);
+                                        const color = stringColor(sub.name);
+                                        
+                                        const dragAttrs = mode === 'batch' ? `draggable="true" ondragstart="event.dataTransfer.setData('reschedule', JSON.stringify({batch: '${alloc.batch}', day: ${day}, pIdx: ${sl.idx}, sid: '${alloc.sid}'})); event.stopPropagation();"` : '';
+
+                                        // Compact rendering if multiple
+                                        html += `<div class="p-1 group/item relative hover:brightness-95 transition scheduled-item shadow-sm rounded-sm shrink-0 border border-transparent hover:border-gray-300 bg-white" ${dragAttrs} style="border-left: 3px solid ${color}; min-height: 40px; display:flex; flex-direction:column; justify-content:center;">
+                                                <div class="flex justify-between items-start">
+                                                    <div class="font-bold text-[10px] text-gray-800 leading-tight">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</div>
+                                                    ${sub.spec ? `<div class="text-[8px] bg-blue-100 text-blue-700 px-1 rounded ml-1 truncate max-w-[40px]">${sub.spec}</div>` : ''}
+                                                </div>
+                                                <div class="text-[9px] leading-tight text-gray-600 my-0.5 line-clamp-1">${sub.name}</div>
+                                                <div class="text-[8px] font-bold text-gray-400 uppercase tracking-tight">${mode==='batch' ? sub.fac : mode==='room' ? sub.fac : (sub.room || 'N/A')}</div>
+                                                ${mode==='batch' && sub.room ? `<div class="text-[8px] text-indigo-600 font-bold"><i class="fa-solid fa-door-open"></i> ${sub.room}</div>` : ''}
+                                                ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx}, '${sub.id}')" class="absolute top-0 right-0 p-1 text-red-400 opacity-0 group-hover/item:opacity-100 hover:text-red-600 transition z-10"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
+                                            </div>`;
+                                    });
+                                    html += `</div>`;
                                 } else {
-                                    html += `<div class="grid-cell bg-gray-50/20"></div>`;
+                                    if(mode === 'batch') {
+                                        html += `<div class="grid-cell hover:bg-indigo-50/50 transition-colors group relative" ${dropAttrs}>
+                                            <button onclick="promptQuickActivity(${day}, ${sl.idx}, '${entity}')" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-white/50 text-indigo-400 hover:text-indigo-600 text-[10px] font-bold transition rounded shadow-inner">
+                                                + Add Activity
+                                            </button>
+                                        </div>`;
+                                    } else {
+                                        html += `<div class="grid-cell bg-gray-50/20"></div>`;
+                                    }
                                 }
                             }
                         }
@@ -890,6 +1649,19 @@
             const pool = document.getElementById('pool'); pool.innerHTML = '';
             const subs = app.subjects.filter(s => s.batch === b);
             let totalRem = 0;
+
+            const totalReqHrs = subs.reduce((sum, s) => sum + s.hrs, 0);
+            const totalUsedHrs = subs.reduce((sum, s) => sum + app.schedule.filter(x => x.sid === s.id).length, 0);
+            const pct = totalReqHrs > 0 ? Math.round((totalUsedHrs / totalReqHrs) * 100) : 0;
+
+            const progBox = document.getElementById('batchProgressContainer');
+            if (progBox) {
+                progBox.classList.remove('hidden');
+                document.getElementById('batchProgressPercent').innerText = `${pct}%`;
+                document.getElementById('batchProgressBar').style.width = `${pct}%`;
+                document.getElementById('batchScheduledSlots').innerText = `${totalUsedHrs}h scheduled`;
+                document.getElementById('batchTotalSlots').innerText = `${totalReqHrs}h required`;
+            }
 
             subs.forEach(s => {
                 const used = app.schedule.filter(x => x.sid === s.id).length;
@@ -1092,23 +1864,46 @@
                 const body = [];
                 DAYS.forEach((dName, d) => {
                     const row = [dName];
+                    let skipNext = false;
+
                     slots.forEach(sl => {
-                        if (sl.type === 'lunch') { row.push('BREAK'); } 
-                        else {
-                            let allocs = [];
-                            if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === d && s.pIdx === sl.idx);
-                            else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === d && s.pIdx === sl.idx; });
-                            else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === d && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
-                                
-                            if (allocs.length > 0) {
-                                let texts = allocs.map(alloc => {
-                                    const sub = app.subjects.find(x => x.id === alloc.sid);
-                                    let txt = `${sub.code}\n${type === 'Batch' ? sub.fac : type === 'Room' ? sub.batch : sub.batch}\n${type === 'Room' ? sub.fac : (sub.room || '')}`;
-                                    if(sub.spec) txt += `\n[${sub.spec}]`;
-                                    return txt;
+                        if (sl.type === 'lunch') { 
+                            row.push('BREAK'); 
+                            skipNext = false;
+                        } else {
+                            if (skipNext) {
+                                skipNext = false;
+                                return;
+                            }
+
+                            const labInfo = getPairedLabInfo(entity, type, d, sl.idx);
+                            if (labInfo && labInfo.isFirst) {
+                                const sub = labInfo.sub;
+                                let txt = `[2-SLOT LAB CLASS]\n${sub.code}: ${sub.name}\nFaculty: ${type === 'Batch' ? sub.fac : sub.batch} | Room: ${sub.room || 'N/A'}`;
+                                if(sub.spec) txt += ` | Spec: ${sub.spec}`;
+
+                                row.push({
+                                    content: txt,
+                                    colSpan: 2,
+                                    styles: { fillColor: [243, 232, 255], fontStyle: 'bold', halign: 'center', textColor: [88, 28, 135], lineWidth: 0.5, lineColor: [147, 51, 234] }
                                 });
-                                row.push(texts.join('\n------\n'));
-                            } else { row.push(''); }
+                                skipNext = true;
+                            } else {
+                                let allocs = [];
+                                if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === d && s.pIdx === sl.idx);
+                                else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === d && s.pIdx === sl.idx; });
+                                else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === d && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
+                                    
+                                if (allocs.length > 0) {
+                                    let texts = allocs.map(alloc => {
+                                        const sub = app.subjects.find(x => x.id === alloc.sid);
+                                        let txt = `${sub.code}\n${type === 'Batch' ? sub.fac : type === 'Room' ? sub.batch : sub.batch}\n${type === 'Room' ? sub.fac : (sub.room || '')}`;
+                                        if(sub.spec) txt += `\n[${sub.spec}]`;
+                                        return txt;
+                                    });
+                                    row.push(texts.join('\n------\n'));
+                                } else { row.push(''); }
+                            }
                         }
                     });
                     body.push(row);
@@ -1153,6 +1948,7 @@
 
             const createSheet = (entity, type) => {
                 const data = [];
+                const merges = [];
                 data.push([`${app.config.college} | ${app.config.dept || ''}`]);
                 data.push([`${type} Timetable: ${entity}`]);
                 data.push([]); 
@@ -1161,36 +1957,69 @@
                 slots.forEach(sl => headers.push(sl.type === 'lunch' ? 'LUNCH' : `P${sl.idx+1} (${sl.label})`));
                 data.push(headers);
 
-                DAYS.forEach((dName, d) => {
+                const startRowIdx = 4; // Headers are at index 3, MON is at index 4
+
+                DAYS.forEach((dName, dIdx) => {
                     const row = [dName];
-                    slots.forEach(sl => {
-                        if (sl.type === 'lunch') { row.push('BREAK'); } 
-                        else {
-                            let allocs = [];
-                            if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === d && s.pIdx === sl.idx);
-                            else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === d && s.pIdx === sl.idx; });
-                            else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === d && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
-                                
-                            if (allocs.length > 0) {
-                                let texts = allocs.map(alloc => {
-                                    const sub = app.subjects.find(x => x.id === alloc.sid);
-                                    let txt = `${sub.name} ${sub.spec?`[${sub.spec}]`:''} - ${sub.code}`;
-                                    txt += `\n${type === 'Batch' ? sub.fac : sub.batch}`;
-                                    if (type !== 'Room' && sub.room) txt += ` (Room: ${sub.room})`;
-                                    return txt;
+                    let skipNext = false;
+                    const currentRowIdx = startRowIdx + dIdx;
+
+                    slots.forEach((sl, slColIdx) => {
+                        const colIdx = slColIdx + 1; // Column 0 is 'DAY'
+
+                        if (sl.type === 'lunch') { 
+                            row.push('BREAK'); 
+                            skipNext = false;
+                        } else {
+                            if (skipNext) {
+                                row.push('');
+                                skipNext = false;
+                                return;
+                            }
+
+                            const labInfo = getPairedLabInfo(entity, type, dIdx, sl.idx);
+                            if (labInfo && labInfo.isFirst) {
+                                const sub = labInfo.sub;
+                                let txt = `[2-SLOT LAB] ${sub.code} - ${sub.name}\nFaculty: ${type === 'Batch' ? sub.fac : sub.batch}`;
+                                if (type !== 'Room' && sub.room) txt += ` | Room: ${sub.room}`;
+                                if (sub.spec) txt += ` | Spec: ${sub.spec}`;
+
+                                row.push(txt);
+                                merges.push({
+                                    s: { r: currentRowIdx, c: colIdx },
+                                    e: { r: currentRowIdx, c: colIdx + 1 }
                                 });
-                                row.push(texts.join('\n---\n'));
-                            } else { row.push(''); }
+                                skipNext = true;
+                            } else {
+                                let allocs = [];
+                                if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === dIdx && s.pIdx === sl.idx);
+                                else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === dIdx && s.pIdx === sl.idx; });
+                                else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === dIdx && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
+                                    
+                                if (allocs.length > 0) {
+                                    let texts = allocs.map(alloc => {
+                                        const sub = app.subjects.find(x => x.id === alloc.sid);
+                                        let txt = `${sub.name} ${sub.spec?`[${sub.spec}]`:''} - ${sub.code}`;
+                                        txt += `\n${type === 'Batch' ? sub.fac : sub.batch}`;
+                                        if (type !== 'Room' && sub.room) txt += ` (Room: ${sub.room})`;
+                                        return txt;
+                                    });
+                                    row.push(texts.join('\n---\n'));
+                                } else { row.push(''); }
+                            }
                         }
                     });
                     data.push(row);
                 });
-                return data;
+
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                if (merges.length > 0) ws['!merges'] = merges;
+                return ws;
             };
 
-            batches.forEach(b => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(createSheet(b, 'Batch')), `B_${b.substring(0, 25)}`));
-            faculty.forEach(f => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(createSheet(f, 'Faculty')), `F_${f.substring(0, 25)}`));
-            rooms.forEach(r => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(createSheet(r, 'Room')), `R_${r.substring(0, 25)}`));
+            batches.forEach(b => XLSX.utils.book_append_sheet(wb, createSheet(b, 'Batch'), `B_${b.substring(0, 25)}`));
+            faculty.forEach(f => XLSX.utils.book_append_sheet(wb, createSheet(f, 'Faculty'), `F_${f.substring(0, 25)}`));
+            rooms.forEach(r => XLSX.utils.book_append_sheet(wb, createSheet(r, 'Room'), `R_${r.substring(0, 25)}`));
             
             XLSX.writeFile(wb, `Timetables_${app.config.college.replace(/\s+/g, '_')}.xlsx`);
             toast('Success', 'Excel workbook generated successfully.');
@@ -1224,29 +2053,54 @@
 
                 DAYS.forEach((dName, dIdx) => {
                     h += `<tr><td style="font-weight:bold;">${dName}</td>`;
+                    let skipNext = false;
+
                     slots.forEach(sl => {
                         if (sl.type === 'lunch') {
                             if (dIdx === 0) h += `<td rowspan="${DAYS.length}" class="print-lunch-cell">LUNCH BREAK</td>`;
+                            skipNext = false;
                         } else {
-                            let allocs = [];
-                            if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === dIdx && s.pIdx === sl.idx);
-                            else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === dIdx && s.pIdx === sl.idx; });
-                            else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === dIdx && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
-                            
-                            if (allocs.length > 0) {
-                                h += `<td><div style="display:flex; flex-direction:column; gap:4px; height:100%;">`;
-                                allocs.forEach((alloc, i) => {
-                                    const sub = app.subjects.find(z => z.id === alloc.sid);
-                                    if(i > 0) h += `<div style="border-top:1px dashed #aaa; margin-top:2px; padding-top:2px;"></div>`;
-                                    h += `<div>
-                                        <div style="font-weight:bold; color:#000;">${sub.code} ${sub.spec ? `<span style="font-size:8px; border:1px solid #000; padding:1px 3px; border-radius:3px;">${sub.spec}</span>` : ''}</div>
-                                        <div style="font-size:10px;">${type === 'Batch' ? sub.fac : sub.batch}</div>
-                                        ${type !== 'Room' && sub.room ? `<div style="font-size:10px; font-weight:bold;">[${sub.room}]</div>` : ''}
-                                        ${type === 'Room' ? `<div style="font-size:10px; font-weight:bold;">[${sub.fac}]</div>` : ''}
-                                    </div>`;
-                                });
-                                h += `</div></td>`;
-                            } else { h += `<td></td>`; }
+                            if (skipNext) {
+                                skipNext = false;
+                                return;
+                            }
+
+                            const labInfo = getPairedLabInfo(entity, type, dIdx, sl.idx);
+                            if (labInfo && labInfo.isFirst) {
+                                const sub = labInfo.sub;
+                                h += `<td colspan="2" style="background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%); border: 2px solid #7e22ce; text-align: center; padding: 8px; border-radius: 6px;">
+                                    <div style="font-weight:900; color:#581c87; font-size:11px; text-transform:uppercase;">
+                                        <i class="fa-solid fa-flask"></i> 2-SLOT COMBINED LAB CLASS
+                                    </div>
+                                    <div style="font-size:11px; font-weight:bold; color:#1e1b4b; margin:4px 0;">${sub.code} - ${sub.name}</div>
+                                    <div style="font-size:9.5px; font-weight:bold; color:#4c1d95;">
+                                        <span>Faculty: ${type === 'Batch' ? sub.fac : sub.batch}</span>
+                                        ${type !== 'Room' && sub.room ? `<span style="margin-left:8px;">| Room: ${sub.room}</span>` : ''}
+                                        ${sub.spec ? `<span style="margin-left:8px; background:#ddd6fe; padding:1px 4px; border-radius:3px;">${sub.spec}</span>` : ''}
+                                    </div>
+                                </td>`;
+                                skipNext = true;
+                            } else {
+                                let allocs = [];
+                                if (type === 'Batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === dIdx && s.pIdx === sl.idx);
+                                else if (type === 'Room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === entity && s.day === dIdx && s.pIdx === sl.idx; });
+                                else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === entity && s.day === dIdx && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
+                                
+                                if (allocs.length > 0) {
+                                    h += `<td><div style="display:flex; flex-direction:column; gap:4px; height:100%;">`;
+                                    allocs.forEach((alloc, i) => {
+                                        const sub = app.subjects.find(z => z.id === alloc.sid);
+                                        if(i > 0) h += `<div style="border-top:1px dashed #aaa; margin-top:2px; padding-top:2px;"></div>`;
+                                        h += `<div>
+                                            <div style="font-weight:bold; color:#000;">${sub.code} ${sub.spec ? `<span style="font-size:8px; border:1px solid #000; padding:1px 3px; border-radius:3px;">${sub.spec}</span>` : ''}</div>
+                                            <div style="font-size:10px;">${type === 'Batch' ? sub.fac : sub.batch}</div>
+                                            ${type !== 'Room' && sub.room ? `<div style="font-size:10px; font-weight:bold;">[${sub.room}]</div>` : ''}
+                                            ${type === 'Room' ? `<div style="font-size:10px; font-weight:bold;">[${sub.fac}]</div>` : ''}
+                                        </div>`;
+                                    });
+                                    h += `</div></td>`;
+                                } else { h += `<td></td>`; }
+                            }
                         }
                     });
                     h += `</tr>`;
@@ -1274,13 +2128,348 @@
             setTimeout(() => { window.print(); div.innerHTML = ''; }, 300);
         }
 
+        let currentDayViewIdx = 0;
+        let currentDayViewMode = 'batch';
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        }
+
+        function openWorkloadModal() {
+            const el = document.getElementById('modalWorkload');
+            if (el) el.classList.remove('hidden');
+            try {
+                renderWorkloadModal();
+            } catch (err) {
+                console.error('Workload Modal error:', err);
+            }
+        }
+
+        function openDevModal() {
+            const el = document.getElementById('modalDev');
+            if (el) el.classList.remove('hidden');
+            try {
+                selectUpiAmount(500);
+            } catch (err) {
+                console.error('Dev Modal error:', err);
+            }
+        }
+
+        function selectUpiAmount(amt) {
+            const customBox = document.getElementById('customUpiBox');
+            if (amt === 'custom') {
+                if (customBox) customBox.classList.remove('hidden');
+                selectedUpiAmt = parseInt(document.getElementById('customUpiInput')?.value || 100);
+            } else {
+                if (customBox) customBox.classList.add('hidden');
+                selectedUpiAmt = amt;
+            }
+
+            [50, 500, 5000, 'custom'].forEach(a => {
+                const btn = document.getElementById('upi-amt-' + a);
+                if (btn) {
+                    if (a === amt) {
+                        btn.className = "py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-extrabold text-xs shadow-md border border-indigo-400 transition";
+                    } else {
+                        btn.className = "py-2 bg-white/10 hover:bg-white/20 text-gray-200 rounded-xl font-extrabold text-xs border border-white/20 transition";
+                    }
+                }
+            });
+
+            updateUpiLink();
+        }
+
+        function updateUpiLink() {
+            let amt = selectedUpiAmt;
+            const customBox = document.getElementById('customUpiBox');
+            if (customBox && !customBox.classList.contains('hidden')) {
+                const val = parseInt(document.getElementById('customUpiInput')?.value || 0);
+                amt = val > 0 ? val : 100;
+            }
+
+            const upiUri = `upi://pay?pa=9664301637@upi&pn=Jitendra%20Prajapat&am=${amt}&cu=INR&tn=University%20Scheduler%20Commercial%20License`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiUri)}`;
+
+            const btnDeepLink = document.getElementById('btnPayUpiDeepLink');
+            if (btnDeepLink) btnDeepLink.href = upiUri;
+
+            const qrImg = document.getElementById('upiQrCodeImg');
+            if (qrImg) qrImg.src = qrUrl;
+        }
+
+        function copyUpiId() {
+            navigator.clipboard.writeText('9664301637@upi').then(() => {
+                toast('Copied!', 'UPI ID 9664301637@upi copied to clipboard.');
+            }).catch(() => {
+                toast('UPI ID', '9664301637@upi (Ph: 9664301637)');
+            });
+        }
+
+        function selectDayView(idx) {
+            currentDayViewIdx = idx;
+            DAYS.forEach((_, i) => {
+                const btn = document.getElementById('day-tab-' + i);
+                if (btn) {
+                    if (i === idx) btn.className = "px-3 py-1 rounded-lg text-xs font-extrabold transition bg-indigo-600 text-white shadow-xs";
+                    else btn.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-gray-600 hover:bg-gray-200";
+                }
+            });
+            renderDayView();
+        }
+
+        function toggleDayViewMode(mode) {
+            currentDayViewMode = mode;
+            const btnB = document.getElementById('btn-dmode-batch');
+            const btnF = document.getElementById('btn-dmode-faculty');
+            if (btnB && btnF) {
+                if (mode === 'batch') {
+                    btnB.className = "px-2.5 py-1 rounded-lg text-xs font-extrabold bg-indigo-600 text-white shadow-xs";
+                    btnF.className = "px-2.5 py-1 rounded-lg text-xs font-bold text-gray-600 hover:text-indigo-600";
+                } else {
+                    btnF.className = "px-2.5 py-1 rounded-lg text-xs font-extrabold bg-indigo-600 text-white shadow-xs";
+                    btnB.className = "px-2.5 py-1 rounded-lg text-xs font-bold text-gray-600 hover:text-indigo-600";
+                }
+            }
+            renderDayView();
+        }
+
+        function renderDayView() {
+            const container = document.getElementById('dayGridContainer');
+            const statsInline = document.getElementById('dayStatsInline');
+            if (!container) return;
+
+            const dayName = DAYS[currentDayViewIdx];
+            const slots = getSlots();
+            const search = (document.getElementById('dayViewSearch')?.value || '').toLowerCase().trim();
+
+            const daySchedule = app.schedule.filter(s => s.day === currentDayViewIdx);
+            const activeFac = new Set(daySchedule.map(s => {
+                const sub = app.subjects.find(x => x.id === s.sid);
+                return sub && !ACTIVITY_TYPES.includes(sub.type) ? cleanStr(sub.fac) : null;
+            }).filter(Boolean));
+
+            const totalFac = getAcademicFaculty();
+            const freeFacCount = Math.max(0, totalFac.length - activeFac.size);
+            const activeBatches = new Set(daySchedule.map(s => s.batch)).size;
+
+            if (statsInline) {
+                statsInline.innerHTML = `
+                <span class="text-indigo-900 font-extrabold"><i class="fa-solid fa-calendar-day text-indigo-600 mr-1"></i>${dayName}DAY</span>
+                <span class="text-gray-300">|</span>
+                <span class="text-emerald-700 font-bold"><i class="fa-solid fa-user-check text-emerald-600 mr-1"></i>${activeFac.size} Active Fac (${freeFacCount} Free)</span>
+                <span class="text-gray-300">|</span>
+                <span class="text-purple-700 font-bold"><i class="fa-solid fa-layer-group text-purple-600 mr-1"></i>${activeBatches} Batches</span>
+                `;
+            }
+
+            if (currentDayViewMode === 'batch') {
+                const batches = [...new Set(app.subjects.map(s => s.batch))].sort();
+                if (batches.length === 0) {
+                    container.innerHTML = `<div class="text-center text-gray-400 italic py-12">No batches added yet. Create subjects in Data Entry first.</div>`;
+                    return;
+                }
+
+                let html = `<div class="p-2 overflow-x-auto"><table class="w-full text-left border-collapse min-w-[850px]"><thead><tr class="bg-gray-900 text-white text-[10.5px] font-extrabold uppercase">`;
+                html += `<th class="p-2.5 rounded-tl-xl w-32 border-r border-gray-700">BATCH</th>`;
+                slots.forEach(sl => {
+                    if (sl.type === 'lunch') {
+                        html += `<th class="p-2.5 text-center bg-gray-800 text-amber-300 border-r border-gray-700">LUNCH<br><span class="text-[8.5px] text-gray-400 font-normal">${sl.label}</span></th>`;
+                    } else {
+                        html += `<th class="p-2.5 text-center border-r border-gray-700">P${sl.idx+1}<br><span class="text-[8.5px] text-indigo-300 font-normal">${sl.label}</span></th>`;
+                    }
+                });
+                html += `</tr></thead><tbody class="divide-y divide-gray-200 text-xs">`;
+
+                batches.forEach(b => {
+                    if (search) {
+                        const dayAllocs = daySchedule.filter(s => s.batch === b);
+                        const subMatches = dayAllocs.some(s => {
+                            const sub = app.subjects.find(x => x.id === s.sid);
+                            return sub && (sub.name.toLowerCase().includes(search) || sub.code.toLowerCase().includes(search) || sub.fac.toLowerCase().includes(search) || (sub.room && sub.room.toLowerCase().includes(search)));
+                        });
+                        if (!b.toLowerCase().includes(search) && !subMatches) return;
+                    }
+
+                    html += `<tr class="hover:bg-indigo-50/30 transition"><td class="p-2.5 font-extrabold text-indigo-900 bg-indigo-50/60 border-r border-gray-200 flex items-center gap-1.5"><i class="fa-solid fa-users text-indigo-500"></i> ${b}</td>`;
+
+                    let skipNext = false;
+                    slots.forEach(sl => {
+                        if (sl.type === 'lunch') {
+                            html += `<td class="p-1 text-center bg-amber-50/40 font-bold text-[9.5px] text-amber-700 border-r border-gray-200">LUNCH</td>`;
+                            skipNext = false;
+                        } else {
+                            if (skipNext) {
+                                skipNext = false;
+                                return;
+                            }
+
+                            const labInfo = getPairedLabInfo(b, 'Batch', currentDayViewIdx, sl.idx);
+                            if (labInfo && labInfo.isFirst) {
+                                const sub = labInfo.sub;
+                                const cat = getFacultyCategory(sub.fac);
+                                const catBadge = cat === 'Visiting' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800';
+
+                                html += `<td colspan="2" class="p-1.5 border-r border-gray-200 bg-gradient-to-r from-purple-100/90 to-indigo-100/90 border border-purple-300 rounded-lg shadow-2xs text-center">
+                                    <div class="flex items-center justify-between gap-1 mb-0.5">
+                                        <span class="text-[8.5px] bg-purple-700 text-white font-extrabold px-1.5 py-0.2 rounded"><i class="fa-solid fa-flask"></i> 2-SLOT LAB</span>
+                                        <span class="font-extrabold text-purple-950 text-[9.5px]">${sub.code}</span>
+                                    </div>
+                                    <div class="font-extrabold text-gray-900 text-[9.5px] line-clamp-1 mb-0.5">${sub.name}</div>
+                                    <div class="flex items-center justify-center gap-1.5 text-[8.5px] flex-wrap">
+                                        <span class="px-1.5 py-0.2 rounded font-extrabold ${catBadge} flex items-center gap-0.5">
+                                            <i class="fa-solid fa-user-tie"></i> ${sub.fac}
+                                        </span>
+                                        ${sub.room ? `<span class="bg-white text-indigo-700 font-extrabold px-1 py-0.2 rounded border border-indigo-200"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                    </div>
+                                </td>`;
+                                skipNext = true;
+                            } else {
+                                const allocs = app.schedule.filter(s => s.batch === b && s.day === currentDayViewIdx && s.pIdx === sl.idx);
+                                if (allocs.length > 0) {
+                                    html += `<td class="p-1 border-r border-gray-200 align-top"><div class="flex flex-col gap-0.5">`;
+                                    allocs.forEach(alloc => {
+                                        const sub = app.subjects.find(x => x.id === alloc.sid);
+                                        if (!sub) return;
+                                        const cat = getFacultyCategory(sub.fac);
+                                        const catBadge = cat === 'Visiting' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800';
+
+                                        html += `<div class="p-1 bg-white rounded border border-gray-200 shadow-2xs">
+                                            <div class="flex justify-between items-center text-[9.5px]">
+                                                <span class="font-extrabold text-gray-900">${sub.code}</span>
+                                                ${sub.spec ? `<span class="text-[7.5px] bg-blue-50 text-blue-700 px-1 rounded">${sub.spec}</span>` : ''}
+                                            </div>
+                                            <div class="text-[9px] font-medium text-gray-600 line-clamp-1 my-0.2">${sub.name}</div>
+                                            <div class="mt-0.5 flex items-center justify-between text-[8.5px]">
+                                                <span class="px-1 py-0.2 rounded font-extrabold ${catBadge} flex items-center gap-0.5">
+                                                    <i class="fa-solid fa-user-tie"></i> ${sub.fac}
+                                                </span>
+                                                ${sub.room ? `<span class="text-indigo-600 font-extrabold"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                            </div>
+                                        </div>`;
+                                    });
+                                    html += `</div></td>`;
+                                } else {
+                                    html += `<td class="p-1 border-r border-gray-200 text-center text-gray-300 font-semibold text-[9.5px] bg-gray-50/20">-</td>`;
+                                }
+                            }
+                        }
+                    });
+                    html += `</tr>`;
+                });
+
+                html += `</tbody></table></div>`;
+                container.innerHTML = html;
+            } else {
+                const facultyList = getAcademicFaculty();
+                if (facultyList.length === 0) {
+                    container.innerHTML = `<div class="text-center text-gray-400 italic py-12">No faculty members added yet.</div>`;
+                    return;
+                }
+
+                let html = `<div class="p-2 overflow-x-auto"><table class="w-full text-left border-collapse min-w-[850px]"><thead><tr class="bg-gray-900 text-white text-[10.5px] font-extrabold uppercase">`;
+                html += `<th class="p-2.5 rounded-tl-xl w-40 border-r border-gray-700">FACULTY MEMBER</th>`;
+                slots.forEach(sl => {
+                    if (sl.type === 'lunch') {
+                        html += `<th class="p-2.5 text-center bg-gray-800 text-amber-300 border-r border-gray-700">LUNCH<br><span class="text-[8.5px] text-gray-400 font-normal">${sl.label}</span></th>`;
+                    } else {
+                        html += `<th class="p-2.5 text-center border-r border-gray-700">P${sl.idx+1}<br><span class="text-[8.5px] text-indigo-300 font-normal">${sl.label}</span></th>`;
+                    }
+                });
+                html += `</tr></thead><tbody class="divide-y divide-gray-200 text-xs">`;
+
+                facultyList.forEach(f => {
+                    if (search && !f.toLowerCase().includes(search)) return;
+
+                    const cat = getFacultyCategory(f);
+                    const catBadge = cat === 'Visiting' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800';
+
+                    html += `<tr class="hover:bg-indigo-50/30 transition">
+                        <td class="p-2 font-extrabold text-gray-900 bg-indigo-50/40 border-r border-gray-200">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-[9px] shadow-2xs">${f.charAt(0)}</div>
+                                <div>
+                                    <div class="text-[10px] font-extrabold text-gray-900">${f}</div>
+                                    <div class="text-[7.5px] font-extrabold px-1 py-0.2 rounded inline-block ${catBadge}">${cat}</div>
+                                </div>
+                            </div>
+                        </td>`;
+
+                    let skipNext = false;
+                    slots.forEach(sl => {
+                        if (sl.type === 'lunch') {
+                            html += `<td class="p-1 text-center bg-amber-50/40 font-bold text-[9.5px] text-amber-700 border-r border-gray-200">LUNCH</td>`;
+                            skipNext = false;
+                        } else {
+                            if (skipNext) {
+                                skipNext = false;
+                                return;
+                            }
+
+                            const labInfo = getPairedLabInfo(f, 'Faculty', currentDayViewIdx, sl.idx);
+                            if (labInfo && labInfo.isFirst) {
+                                const sub = labInfo.sub;
+                                html += `<td colspan="2" class="p-1.5 border-r border-gray-200 bg-gradient-to-r from-purple-100/90 to-indigo-100/90 border border-purple-300 rounded-lg shadow-2xs text-center">
+                                    <div class="flex items-center justify-between gap-1 mb-0.5">
+                                        <span class="text-[8.5px] bg-purple-700 text-white font-extrabold px-1.5 py-0.2 rounded"><i class="fa-solid fa-flask"></i> 2-SLOT LAB</span>
+                                        <span class="font-extrabold text-purple-950 text-[9.5px]">${sub.code}</span>
+                                    </div>
+                                    <div class="font-extrabold text-gray-900 text-[9.5px] line-clamp-1 mb-0.5">${sub.name}</div>
+                                    <div class="flex items-center justify-center gap-1.5 text-[8.5px]">
+                                        <span class="bg-indigo-600 text-white font-extrabold px-1.5 py-0.2 rounded"><i class="fa-solid fa-users"></i> ${sub.batch}</span>
+                                        ${sub.room ? `<span class="bg-white text-indigo-700 font-extrabold px-1 py-0.2 rounded border border-indigo-200"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                    </div>
+                                </td>`;
+                                skipNext = true;
+                            } else {
+                                const allocs = app.schedule.filter(s => {
+                                    const sub = app.subjects.find(x => x.id === s.sid);
+                                    return sub && cleanStr(sub.fac) === cleanStr(f) && s.day === currentDayViewIdx && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
+                                });
+
+                                if (allocs.length > 0) {
+                                    html += `<td class="p-1 border-r border-gray-200 align-top"><div class="flex flex-col gap-0.5">`;
+                                    allocs.forEach(alloc => {
+                                        const sub = app.subjects.find(x => x.id === alloc.sid);
+                                        if (!sub) return;
+                                        html += `<div class="p-1 bg-white rounded border border-gray-200 shadow-2xs">
+                                            <div class="font-extrabold text-indigo-900 text-[9.5px]">${sub.code} (${sub.batch})</div>
+                                            <div class="text-[9px] font-medium text-gray-600 line-clamp-1 my-0.2">${sub.name}</div>
+                                            ${sub.room ? `<div class="text-[8.5px] text-indigo-600 font-extrabold"><i class="fa-solid fa-door-open"></i> Room: ${sub.room}</div>` : ''}
+                                        </div>`;
+                                    });
+                                    html += `</div></td>`;
+                                } else {
+                                    html += `<td class="p-1 border-r border-gray-200 text-center text-emerald-600 font-bold text-[9px] bg-emerald-50/20"><i class="fa-solid fa-circle-check text-[8px] mr-0.5"></i> Free</td>`;
+                                }
+                            }
+                        }
+                    });
+                    html += `</tr>`;
+                });
+
+                html += `</tbody></table></div>`;
+                container.innerHTML = html;
+            }
+        }
+
         function switchView(v) {
-            ['data', 'scheduler', 'faculty', 'room', 'free'].forEach(x => { document.getElementById('view-'+x).classList.add('hidden'); document.getElementById('btn-'+x).className = "px-4 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2"; });
-            document.getElementById('view-'+v).classList.remove('hidden'); document.getElementById('btn-'+v).className = "px-4 py-2 rounded-lg text-xs font-bold text-indigo-700 bg-white shadow-sm transition flex items-center gap-2";
+            ['data', 'scheduler', 'faculty', 'room', 'free', 'day'].forEach(x => { 
+                const viewEl = document.getElementById('view-'+x);
+                const btnEl = document.getElementById('btn-'+x);
+                if (viewEl) viewEl.classList.add('hidden');
+                if (btnEl) btnEl.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-1.5"; 
+            });
+            const selView = document.getElementById('view-'+v);
+            const selBtn = document.getElementById('btn-'+v);
+            if (selView) selView.classList.remove('hidden'); 
+            if (selBtn) selBtn.className = "px-3.5 py-1.5 rounded-lg text-xs font-extrabold text-indigo-700 bg-white shadow-xs transition flex items-center gap-1.5";
+            
             if(v === 'scheduler') loadBatch(document.getElementById('selBatch').value); 
             if(v === 'faculty') loadFacultyView(document.getElementById('selFacView').value); 
             if(v === 'room') loadRoomView(document.getElementById('selRoomView').value);
             if(v === 'free') renderGrid('grid-free', null, 'free');
+            if(v === 'day') renderDayView();
         }
 
         function refreshSelectors() {
@@ -1298,7 +2487,24 @@
             document.getElementById('dl-spec').innerHTML = specs.map(x => `<option value="${x}">`).join('');
         }
 
-        function loadFacultyView(f) { renderGrid('grid-fac', f, 'fac'); }
+        function loadFacultyView(f) { 
+            const badgeContainer = document.getElementById('facCategoryBadgeContainer');
+            if (f && badgeContainer) {
+                badgeContainer.classList.remove('hidden');
+                document.getElementById('selFacCategoryEdit').value = getFacultyCategory(f);
+            } else if (badgeContainer) {
+                badgeContainer.classList.add('hidden');
+            }
+            renderGrid('grid-fac', f, 'fac'); 
+        }
+
+        function changeSelectedFacultyCategory(newCat) {
+            const facName = document.getElementById('selFacView').value;
+            if (!facName) return;
+            setFacultyCategory(facName, newCat);
+            toast('Category Updated', `${facName} is now set to ${newCat === 'Visiting' ? 'Visiting Faculty' : 'On-Roll Faculty'}.`);
+        }
+
         function loadRoomView(r) { renderGrid('grid-room', r, 'room'); }
         function stringColor(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return ['#ef4444','#f97316','#f59e0b','#84cc16','#10b981','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#d946ef'][Math.abs(h)%10];}
 
@@ -1312,10 +2518,20 @@
                 for(let k=1; k<d.length; k++) {
                     const row = d[k];
                     if(row[0]) {
+                        const facName = cleanStr(row[2]);
+                        const rawCat = cleanStr(row[8]);
+                        const facCat = (rawCat.toLowerCase().includes('visit') ? 'Visiting' : 'OnRoll');
+                        
+                        if (facName && facName !== 'Staff' && facName !== 'TBA') {
+                            if (!app.faculties) app.faculties = {};
+                            app.faculties[facName] = facCat;
+                        }
+
                         app.subjects.push({
                             id: Math.random().toString(36).substr(2),
-                            code: cleanStr(row[0]), name: row[1], fac: cleanStr(row[2]), batch: cleanStr(row[3]),
-                            hrs: parseInt(row[4]||3), type: row[5]||'Lecture', room: row[6]||'', spec: cleanStr(row[7]) || ''
+                            code: cleanStr(row[0]), name: row[1], fac: facName, batch: cleanStr(row[3]),
+                            hrs: parseInt(row[4]||3), type: row[5]||'Lecture', room: row[6]||'', spec: cleanStr(row[7]) || '',
+                            facCat: facCat
                         }); c++;
                     }
                 }
@@ -1327,12 +2543,12 @@
         function dlTemplate(){ 
             const wb = XLSX.utils.book_new();
             const ws_data = [
-                ["Code", "Subject", "Faculty", "Batch", "Hours", "Type", "Room", "Specialization"], 
-                ["CS-101", "Mathematics", "Dr. Smith", "BCA-1", 4, "Lecture", "Room-101", ""], 
-                ["CS-102", "Physics Lab", "Prof. Doe", "BCA-1", 2, "Lab", "Lab-1", ""],
-                ["AIML-01", "Python for ML", "Dr. Alan", "BCA-1", 3, "Lecture", "Lab-2", "AIML"],
-                ["CYB-01", "Network Security", "Dr. Bob", "BCA-1", 3, "Lecture", "Lab-3", "Cyber Security"],
-                ["ACT-01", "Sports", "Coach Mike", "BCA-1", 1, "Activity", "Ground", ""]
+                ["Code", "Subject", "Faculty", "Batch", "Hours", "Type", "Room", "Specialization", "Faculty Category"], 
+                ["CS-101", "Mathematics", "Dr. Smith", "BCA-1", 4, "Lecture", "Room-101", "", "OnRoll"], 
+                ["CS-102", "Physics Lab", "Prof. Doe", "BCA-1", 2, "Lab", "Lab-1", "", "Visiting"],
+                ["AIML-01", "Python for ML", "Dr. Alan", "BCA-1", 3, "Lecture", "Lab-2", "AIML", "OnRoll"],
+                ["CYB-01", "Network Security", "Dr. Bob", "BCA-1", 3, "Lecture", "Lab-3", "Cyber Security", "Visiting"],
+                ["ACT-01", "Sports", "Coach Mike", "BCA-1", 1, "Activity", "Ground", "", ""]
             ];
             const ws = XLSX.utils.aoa_to_sheet(ws_data);
             XLSX.utils.book_append_sheet(wb, ws, "Template");
