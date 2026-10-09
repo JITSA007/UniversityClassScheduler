@@ -532,11 +532,11 @@
     </div>
 
     <!-- SETTINGS MODAL -->
-    <div id="modalConfig" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center">
+    <div id="modalConfig" onclick="if(event.target===this) closeModal('modalConfig')" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center">
         <div class="glass-panel bg-white p-8 rounded-[2rem] shadow-2xl w-[500px] transform scale-100 transition-all max-h-[90vh] overflow-y-auto c-scroll">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <h3 class="text-2xl font-bold text-gray-800">System Config</h3>
-                <button onclick="document.getElementById('modalConfig').classList.add('hidden')" class="w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeModal('modalConfig')" class="w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition flex items-center justify-center"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
@@ -597,18 +597,18 @@
                 </div>
             </div>
             <div class="flex gap-3 mt-8">
-                <button onclick="document.getElementById('modalConfig').classList.add('hidden')" class="flex-1 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition">Cancel</button>
+                <button onclick="closeModal('modalConfig')" class="flex-1 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition">Cancel</button>
                 <button onclick="saveConfig()" class="flex-1 py-3 rounded-xl font-bold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition">Save Changes</button>
             </div>
         </div>
     </div>
 
     <!-- FREE FACULTY MODAL -->
-    <div id="modalFree" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center">
+    <div id="modalFree" onclick="if(event.target===this) closeModal('modalFree')" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center">
         <div class="glass-panel bg-white p-6 rounded-3xl w-[650px] max-h-[85vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-start mb-4 border-b border-gray-100 pb-4">
                 <div><h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i class="fa-solid fa-user-check text-green-500"></i> Available Faculty</h3><p class="text-xs text-gray-500 font-bold uppercase mt-1" id="freeSubtitle"></p></div>
-                <button onclick="document.getElementById('modalFree').classList.add('hidden')" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeModal('modalFree')" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
             <!-- Category Filter bar inside Modal -->
@@ -1014,11 +1014,7 @@
                 document.getElementById(`sig${i}N`).value = sigs[i-1]?.name || '';
                 document.getElementById(`sig${i}R`).value = sigs[i-1]?.role || '';
             }
-            const modalCfg = document.getElementById('modalConfig');
-            if (modalCfg) {
-                modalCfg.classList.remove('hidden');
-                modalCfg.style.display = 'flex';
-            }
+            openModal('modalConfig');
         }
 
         function saveConfig() {
@@ -1047,7 +1043,7 @@
             app.config.signatures = sigs;
 
             save();
-            document.getElementById('modalConfig').classList.add('hidden');
+            closeModal('modalConfig');
             const b = document.getElementById('selBatch').value; if(b) loadBatch(b);
             toast('Configuration Saved', 'System variables and signatures updated.');
         }
@@ -1576,10 +1572,7 @@
                 if(searchInput) searchInput.focus();
             }
             if (e.key === 'Escape') {
-                ['modalConfig', 'modalFree', 'modalWorkload', 'modalDev'].forEach(m => {
-                    const el = document.getElementById(m);
-                    if(el) el.classList.add('hidden');
-                });
+                ['modalConfig', 'modalFree', 'modalWorkload', 'modalDev'].forEach(m => closeModal(m));
             }
         });
 
@@ -1656,11 +1649,7 @@
                     </span>
                 </div>`;
             }).join('') : `<div class="col-span-2 text-center text-gray-400 italic py-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">No free faculty members available in this category for this slot.</div>`;
-            const mFree = document.getElementById('modalFree');
-            if (mFree) {
-                mFree.classList.remove('hidden');
-                mFree.style.display = 'flex';
-            }
+            openModal('modalFree');
         }
 
         function promptQuickActivity(day, pIdx, batch) {
@@ -1693,14 +1682,19 @@
                             const filteredFac = getAcademicFaculty(freeFacFilter); 
                             const busyFac = new Set(app.schedule.filter(s => s.day === day && s.pIdx === sl.idx).map(s => { 
                                 const sb = app.subjects.find(x => x.id === s.sid); 
-                                if (!sb || ACTIVITY_TYPES.includes(sb.type)) return null;
-                                const facName = cleanStr(sb.fac);
-                                if (freeFacFilter !== 'all' && getFacultyCategory(facName) !== freeFacFilter) return null;
-                                return facName; 
+                                return (sb && !ACTIVITY_TYPES.includes(sb.type)) ? cleanStr(sb.fac) : null;
                             }).filter(Boolean));
                             
-                            const freeCount = Math.max(0, filteredFac.length - busyFac.size);
-                            html += `<div onclick="showFreeFac(${day}, ${sl.idx}, '${sl.label}')" class="grid-cell justify-center items-center cursor-pointer hover:bg-green-50 transition border border-transparent hover:border-green-200"><div class="text-2xl font-bold text-green-600">${freeCount}</div><div class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Available</div></div>`;
+                            const freeList = filteredFac.filter(f => !busyFac.has(f));
+                            const freeCount = freeList.length;
+
+                            html += `<div onclick="showFreeFac(${day}, ${sl.idx}, '${sl.label}')" class="grid-cell p-1.5 flex flex-col justify-center items-center cursor-pointer bg-gradient-to-br from-emerald-50 via-teal-50/60 to-emerald-100/40 hover:from-emerald-100 hover:to-teal-100 transition-all border border-emerald-200/80 rounded-xl m-0.5 shadow-2xs hover:shadow-xs group">
+                                <div class="text-xl font-black text-emerald-800 group-hover:scale-105 transition flex items-center gap-1">
+                                    <i class="fa-solid fa-user-check text-emerald-600 text-sm"></i> ${freeCount}
+                                </div>
+                                <div class="text-[8.5px] font-extrabold text-emerald-800 uppercase tracking-tight">Available</div>
+                                <div class="text-[7.5px] font-extrabold text-emerald-600/90 mt-0.5 bg-white/90 px-1.5 py-0.2 rounded-full border border-emerald-200">Click to view</div>
+                            </div>`;
                         } else {
                             const gridType = mode === 'batch' ? 'Batch' : mode === 'room' ? 'Room' : 'Faculty';
                             const labInfo = getPairedLabInfo(entity, gridType, day, sl.idx);
@@ -2348,6 +2342,14 @@
         let currentDayViewMode = 'batch';
         let selectedUpiAmt = 500;
 
+        function openModal(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('hidden');
+                el.style.display = 'flex';
+            }
+        }
+
         function closeModal(id) {
             const el = document.getElementById(id);
             if (el) {
@@ -2357,11 +2359,7 @@
         }
 
         function openWorkloadModal() {
-            const el = document.getElementById('modalWorkload');
-            if (el) {
-                el.classList.remove('hidden');
-                el.style.display = 'flex';
-            }
+            openModal('modalWorkload');
             try {
                 renderWorkloadModal();
             } catch (err) {
@@ -2370,11 +2368,7 @@
         }
 
         function openDevModal() {
-            const el = document.getElementById('modalDev');
-            if (el) {
-                el.classList.remove('hidden');
-                el.style.display = 'flex';
-            }
+            openModal('modalDev');
             try {
                 selectUpiAmount(500);
             } catch (err) {
@@ -2382,6 +2376,7 @@
             }
         }
 
+        window.openModal = openModal;
         window.closeModal = closeModal;
         window.openWorkloadModal = openWorkloadModal;
         window.openDevModal = openDevModal;
