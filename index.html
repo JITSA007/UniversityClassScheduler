@@ -45,9 +45,10 @@
         /* --- GRID SYSTEM --- */
         .grid-wrapper {
             display: grid; 
-            grid-template-columns: 90px repeat(6, 1fr); 
-            gap: 1px; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); 
-            border-radius: 12px; overflow: hidden;
+            grid-template-columns: 90px repeat(6, minmax(150px, 1fr)); 
+            gap: 1px; background: rgba(203, 213, 225, 0.7); border: 1px solid rgba(203, 213, 225, 0.8); 
+            border-radius: 16px; overflow: hidden; width: 100%; min-width: 990px;
+            contain: layout style;
         }
         .grid-header {
             background: #1e293b; color: white; padding: 10px; font-size: 0.75rem; 
@@ -424,7 +425,11 @@
                         </select>
                     </div>
                 </div>
-                <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl"><div id="grid-fac" class="grid-wrapper"></div></div>
+                <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl">
+                    <div class="overflow-x-auto c-scroll rounded-2xl border border-gray-200/80">
+                        <div id="grid-fac" class="grid-wrapper"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- ROOM VIEW -->
@@ -433,7 +438,11 @@
                     <label class="font-bold text-gray-700 text-lg">Select Room/Lab:</label>
                     <select id="selRoomView" onchange="loadRoomView(this.value)" class="glass-input p-2.5 rounded-xl w-72 font-bold text-gray-800 outline-none"><option value="">Choose Room...</option></select>
                 </div>
-                <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl"><div id="grid-room" class="grid-wrapper"></div></div>
+                <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl">
+                    <div class="overflow-x-auto c-scroll rounded-2xl border border-gray-200/80">
+                        <div id="grid-room" class="grid-wrapper"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- FREE FACULTY VIEW -->
@@ -458,7 +467,11 @@
                         </button>
                     </div>
                 </div>
-                <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl"><div id="grid-free" class="grid-wrapper"></div></div>
+                <div class="glass-panel p-4 rounded-3xl max-w-7xl mx-auto w-full shadow-xl">
+                    <div class="overflow-x-auto c-scroll rounded-2xl border border-gray-200/80">
+                        <div id="grid-free" class="grid-wrapper"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- DAY VIEW -->
@@ -2510,65 +2523,39 @@
 
                     html += `<tr class="hover:bg-indigo-50/30 transition"><td class="p-2.5 font-extrabold text-indigo-900 bg-indigo-50/60 border-r border-gray-200 flex items-center gap-1.5"><i class="fa-solid fa-users text-indigo-500"></i> ${b}</td>`;
 
-                    let skipNext = false;
                     slots.forEach(sl => {
                         if (sl.type === 'lunch') {
                             html += `<td class="p-1 text-center bg-amber-50/40 font-bold text-[9.5px] text-amber-700 border-r border-gray-200">LUNCH</td>`;
-                            skipNext = false;
                         } else {
-                            if (skipNext) {
-                                skipNext = false;
-                                return;
-                            }
+                            const allocs = app.schedule.filter(s => s.batch === b && s.day === currentDayViewIdx && s.pIdx === sl.idx);
+                            if (allocs.length > 0) {
+                                html += `<td class="p-1 border-r border-gray-200 align-top bg-white/40"><div class="flex flex-col gap-1">`;
+                                allocs.forEach(alloc => {
+                                    const sub = app.subjects.find(x => x.id === alloc.sid);
+                                    if (!sub) return;
+                                    const cat = getFacultyCategory(sub.fac);
+                                    const catBadge = cat === 'Visiting' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                                    const isLab = sub.type === 'Lab';
+                                    const cardBg = isLab ? 'bg-gradient-to-r from-purple-50 via-indigo-50/50 to-purple-50/80 border-purple-300' : 'bg-white border-gray-200';
 
-                            const labInfo = getPairedLabInfo(b, 'Batch', currentDayViewIdx, sl.idx);
-                            if (labInfo && labInfo.isFirst) {
-                                const sub = labInfo.sub;
-                                const cat = getFacultyCategory(sub.fac);
-                                const catBadge = cat === 'Visiting' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800';
-
-                                html += `<td colspan="2" class="p-1.5 border-r border-gray-200 bg-gradient-to-r from-purple-100/90 to-indigo-100/90 border border-purple-300 rounded-lg shadow-2xs text-center">
-                                    <div class="flex items-center justify-between gap-1 mb-0.5">
-                                        <span class="text-[8.5px] bg-purple-700 text-white font-extrabold px-1.5 py-0.2 rounded"><i class="fa-solid fa-flask"></i> 2-SLOT LAB</span>
-                                        <span class="font-extrabold text-purple-950 text-[9.5px]">${sub.code}</span>
-                                    </div>
-                                    <div class="font-extrabold text-gray-900 text-[9.5px] line-clamp-1 mb-0.5">${sub.name}</div>
-                                    <div class="flex items-center justify-center gap-1.5 text-[8.5px] flex-wrap">
-                                        <span class="px-1.5 py-0.2 rounded font-extrabold ${catBadge} flex items-center gap-0.5">
-                                            <i class="fa-solid fa-user-tie"></i> ${sub.fac}
-                                        </span>
-                                        ${sub.room ? `<span class="bg-white text-indigo-700 font-extrabold px-1 py-0.2 rounded border border-indigo-200"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
-                                    </div>
-                                </td>`;
-                                skipNext = true;
+                                    html += `<div class="p-1.5 ${cardBg} rounded-xl border shadow-2xs hover:shadow-xs transition">
+                                        <div class="flex justify-between items-center text-[9.5px] mb-0.5">
+                                            <span class="font-extrabold text-gray-900">${sub.code}</span>
+                                            ${isLab ? `<span class="text-[7.5px] bg-purple-700 text-white font-black px-1.5 py-0.2 rounded-full flex items-center gap-0.5"><i class="fa-solid fa-flask"></i> LAB</span>` : ''}
+                                            ${sub.spec ? `<span class="text-[7.5px] bg-indigo-100 text-indigo-700 font-extrabold px-1.5 py-0.2 rounded-full border border-indigo-200">${sub.spec}</span>` : ''}
+                                        </div>
+                                        <div class="text-[9px] font-extrabold text-gray-800 line-clamp-1 mb-0.5" title="${sub.name}">${sub.name}</div>
+                                        <div class="flex items-center justify-between gap-1 text-[8.5px] pt-0.5 border-t border-gray-100 flex-wrap">
+                                            <span class="px-1.5 py-0.2 rounded font-extrabold ${catBadge} flex items-center gap-0.5 truncate max-w-[100px]">
+                                                <i class="fa-solid fa-user-tie"></i> ${sub.fac}
+                                            </span>
+                                            ${sub.room ? `<span class="bg-white text-indigo-700 font-extrabold px-1 py-0.2 rounded border border-indigo-200 shrink-0"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                        </div>
+                                    </div>`;
+                                });
+                                html += `</div></td>`;
                             } else {
-                                const allocs = app.schedule.filter(s => s.batch === b && s.day === currentDayViewIdx && s.pIdx === sl.idx);
-                                if (allocs.length > 0) {
-                                    html += `<td class="p-1 border-r border-gray-200 align-top"><div class="flex flex-col gap-0.5">`;
-                                    allocs.forEach(alloc => {
-                                        const sub = app.subjects.find(x => x.id === alloc.sid);
-                                        if (!sub) return;
-                                        const cat = getFacultyCategory(sub.fac);
-                                        const catBadge = cat === 'Visiting' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800';
-
-                                        html += `<div class="p-1 bg-white rounded border border-gray-200 shadow-2xs">
-                                            <div class="flex justify-between items-center text-[9.5px]">
-                                                <span class="font-extrabold text-gray-900">${sub.code}</span>
-                                                ${sub.spec ? `<span class="text-[7.5px] bg-blue-50 text-blue-700 px-1 rounded">${sub.spec}</span>` : ''}
-                                            </div>
-                                            <div class="text-[9px] font-medium text-gray-600 line-clamp-1 my-0.2">${sub.name}</div>
-                                            <div class="mt-0.5 flex items-center justify-between text-[8.5px]">
-                                                <span class="px-1 py-0.2 rounded font-extrabold ${catBadge} flex items-center gap-0.5">
-                                                    <i class="fa-solid fa-user-tie"></i> ${sub.fac}
-                                                </span>
-                                                ${sub.room ? `<span class="text-indigo-600 font-extrabold"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
-                                            </div>
-                                        </div>`;
-                                    });
-                                    html += `</div></td>`;
-                                } else {
-                                    html += `<td class="p-1 border-r border-gray-200 text-center text-gray-300 font-semibold text-[9.5px] bg-gray-50/20">-</td>`;
-                                }
+                                html += `<td class="p-1 border-r border-gray-200 text-center text-gray-300 font-semibold text-[9.5px] bg-gray-50/20">-</td>`;
                             }
                         }
                     });
@@ -2612,53 +2599,41 @@
                             </div>
                         </td>`;
 
-                    let skipNext = false;
                     slots.forEach(sl => {
                         if (sl.type === 'lunch') {
                             html += `<td class="p-1 text-center bg-amber-50/40 font-bold text-[9.5px] text-amber-700 border-r border-gray-200">LUNCH</td>`;
-                            skipNext = false;
                         } else {
-                            if (skipNext) {
-                                skipNext = false;
-                                return;
-                            }
+                            const allocs = app.schedule.filter(s => {
+                                const sub = app.subjects.find(x => x.id === s.sid);
+                                return sub && cleanStr(sub.fac) === cleanStr(f) && s.day === currentDayViewIdx && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
+                            });
 
-                            const labInfo = getPairedLabInfo(f, 'Faculty', currentDayViewIdx, sl.idx);
-                            if (labInfo && labInfo.isFirst) {
-                                const sub = labInfo.sub;
-                                html += `<td colspan="2" class="p-1.5 border-r border-gray-200 bg-gradient-to-r from-purple-100/90 to-indigo-100/90 border border-purple-300 rounded-lg shadow-2xs text-center">
-                                    <div class="flex items-center justify-between gap-1 mb-0.5">
-                                        <span class="text-[8.5px] bg-purple-700 text-white font-extrabold px-1.5 py-0.2 rounded"><i class="fa-solid fa-flask"></i> 2-SLOT LAB</span>
-                                        <span class="font-extrabold text-purple-950 text-[9.5px]">${sub.code}</span>
-                                    </div>
-                                    <div class="font-extrabold text-gray-900 text-[9.5px] line-clamp-1 mb-0.5">${sub.name}</div>
-                                    <div class="flex items-center justify-center gap-1.5 text-[8.5px]">
-                                        <span class="bg-indigo-600 text-white font-extrabold px-1.5 py-0.2 rounded"><i class="fa-solid fa-users"></i> ${sub.batch}</span>
-                                        ${sub.room ? `<span class="bg-white text-indigo-700 font-extrabold px-1 py-0.2 rounded border border-indigo-200"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
-                                    </div>
-                                </td>`;
-                                skipNext = true;
-                            } else {
-                                const allocs = app.schedule.filter(s => {
-                                    const sub = app.subjects.find(x => x.id === s.sid);
-                                    return sub && cleanStr(sub.fac) === cleanStr(f) && s.day === currentDayViewIdx && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type);
+                            if (allocs.length > 0) {
+                                html += `<td class="p-1 border-r border-gray-200 align-top bg-white/40"><div class="flex flex-col gap-1">`;
+                                allocs.forEach(alloc => {
+                                    const sub = app.subjects.find(x => x.id === alloc.sid);
+                                    if (!sub) return;
+                                    const isLab = sub.type === 'Lab';
+                                    const cardBg = isLab ? 'bg-gradient-to-r from-purple-50 via-indigo-50/50 to-purple-50/80 border-purple-300' : 'bg-white border-gray-200';
+
+                                    html += `<div class="p-1.5 ${cardBg} rounded-xl border shadow-2xs hover:shadow-xs transition">
+                                        <div class="flex justify-between items-center text-[9.5px] mb-0.5">
+                                            <span class="font-extrabold text-indigo-950">${sub.code}</span>
+                                            ${isLab ? `<span class="text-[7.5px] bg-purple-700 text-white font-black px-1.5 py-0.2 rounded-full flex items-center gap-0.5"><i class="fa-solid fa-flask"></i> LAB</span>` : ''}
+                                            ${sub.spec ? `<span class="text-[7.5px] bg-indigo-100 text-indigo-700 font-extrabold px-1.5 py-0.2 rounded-full border border-indigo-200">${sub.spec}</span>` : ''}
+                                        </div>
+                                        <div class="text-[9px] font-extrabold text-gray-800 line-clamp-1 mb-0.5" title="${sub.name}">${sub.name}</div>
+                                        <div class="flex items-center justify-between gap-1 text-[8.5px] pt-0.5 border-t border-gray-100 flex-wrap">
+                                            <span class="bg-indigo-600 text-white font-extrabold px-1.5 py-0.2 rounded flex items-center gap-0.5">
+                                                <i class="fa-solid fa-users"></i> ${sub.batch}
+                                            </span>
+                                            ${sub.room ? `<span class="bg-white text-indigo-700 font-extrabold px-1 py-0.2 rounded border border-indigo-200 shrink-0"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                        </div>
+                                    </div>`;
                                 });
-
-                                if (allocs.length > 0) {
-                                    html += `<td class="p-1 border-r border-gray-200 align-top"><div class="flex flex-col gap-0.5">`;
-                                    allocs.forEach(alloc => {
-                                        const sub = app.subjects.find(x => x.id === alloc.sid);
-                                        if (!sub) return;
-                                        html += `<div class="p-1 bg-white rounded border border-gray-200 shadow-2xs">
-                                            <div class="font-extrabold text-indigo-900 text-[9.5px]">${sub.code} (${sub.batch})</div>
-                                            <div class="text-[9px] font-medium text-gray-600 line-clamp-1 my-0.2">${sub.name}</div>
-                                            ${sub.room ? `<div class="text-[8.5px] text-indigo-600 font-extrabold"><i class="fa-solid fa-door-open"></i> Room: ${sub.room}</div>` : ''}
-                                        </div>`;
-                                    });
-                                    html += `</div></td>`;
-                                } else {
-                                    html += `<td class="p-1 border-r border-gray-200 text-center text-emerald-600 font-bold text-[9px] bg-emerald-50/20"><i class="fa-solid fa-circle-check text-[8px] mr-0.5"></i> Free</td>`;
-                                }
+                                html += `</div></td>`;
+                            } else {
+                                html += `<td class="p-1 border-r border-gray-200 text-center text-emerald-600 font-bold text-[9px] bg-emerald-50/20"><i class="fa-solid fa-circle-check text-[8px] mr-0.5"></i> Free</td>`;
                             }
                         }
                     });
