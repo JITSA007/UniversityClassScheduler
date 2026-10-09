@@ -603,6 +603,8 @@
 
             <div id="freeList" class="flex-1 overflow-y-auto c-scroll grid grid-cols-2 gap-3 p-1"></div>
         </div>
+    </div>
+
     <!-- FACULTY WORKLOAD ANALYTICS MODAL -->
     <div id="modalWorkload" onclick="if(event.target===this) closeModal('modalWorkload')" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[75] flex items-center justify-center p-4">
         <div class="glass-panel bg-white p-6 rounded-3xl w-[820px] max-h-[88vh] flex flex-col shadow-2xl border border-white/40">
@@ -877,7 +879,11 @@
                 document.getElementById(`sig${i}N`).value = sigs[i-1]?.name || '';
                 document.getElementById(`sig${i}R`).value = sigs[i-1]?.role || '';
             }
-            document.getElementById('modalConfig').classList.remove('hidden');
+            const modalCfg = document.getElementById('modalConfig');
+            if (modalCfg) {
+                modalCfg.classList.remove('hidden');
+                modalCfg.style.display = 'flex';
+            }
         }
 
         function saveConfig() {
@@ -1237,11 +1243,6 @@
             renderWorkloadModal();
         }
 
-        function openWorkloadModal() {
-            renderWorkloadModal();
-            document.getElementById('modalWorkload').classList.remove('hidden');
-        }
-
         function renderWorkloadModal() {
             const list = getAcademicFaculty();
             const container = document.getElementById('workloadList');
@@ -1506,7 +1507,11 @@
                     </span>
                 </div>`;
             }).join('') : `<div class="col-span-2 text-center text-gray-400 italic py-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">No free faculty members available in this category for this slot.</div>`;
-            document.getElementById('modalFree').classList.remove('hidden');
+            const mFree = document.getElementById('modalFree');
+            if (mFree) {
+                mFree.classList.remove('hidden');
+                mFree.style.display = 'flex';
+            }
         }
 
         function promptQuickActivity(day, pIdx, batch) {
@@ -2130,15 +2135,22 @@
 
         let currentDayViewIdx = 0;
         let currentDayViewMode = 'batch';
+        let selectedUpiAmt = 500;
 
         function closeModal(id) {
             const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
+            if (el) {
+                el.classList.add('hidden');
+                el.style.display = 'none';
+            }
         }
 
         function openWorkloadModal() {
             const el = document.getElementById('modalWorkload');
-            if (el) el.classList.remove('hidden');
+            if (el) {
+                el.classList.remove('hidden');
+                el.style.display = 'flex';
+            }
             try {
                 renderWorkloadModal();
             } catch (err) {
@@ -2148,13 +2160,20 @@
 
         function openDevModal() {
             const el = document.getElementById('modalDev');
-            if (el) el.classList.remove('hidden');
+            if (el) {
+                el.classList.remove('hidden');
+                el.style.display = 'flex';
+            }
             try {
                 selectUpiAmount(500);
             } catch (err) {
                 console.error('Dev Modal error:', err);
             }
         }
+
+        window.closeModal = closeModal;
+        window.openWorkloadModal = openWorkloadModal;
+        window.openDevModal = openDevModal;
 
         function selectUpiAmount(amt) {
             const customBox = document.getElementById('customUpiBox');
