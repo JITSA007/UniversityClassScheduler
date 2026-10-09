@@ -1698,21 +1698,21 @@
                                 const alloc = labInfo.alloc;
                                 const dragAttrs = mode === 'batch' ? `draggable="true" ondragstart="event.dataTransfer.setData('reschedule', JSON.stringify({batch: '${alloc.batch}', day: ${day}, pIdx: ${sl.idx}, sid: '${alloc.sid}'})); event.stopPropagation();"` : '';
                                 
-                                html += `<div class="grid-cell p-0.5 flex flex-col transition-all group relative bg-gradient-to-b from-purple-100/90 via-purple-50/80 to-indigo-50/70 border-2 border-purple-400 rounded-t-xl border-b-0 shadow-md z-10" ${dropAttrs}>
-                                    <div class="p-1.5 group/item relative hover:brightness-95 transition scheduled-item rounded-lg bg-white/90 border border-purple-200 shadow-sm h-full flex flex-col justify-between" ${dragAttrs}>
-                                        <div class="flex justify-between items-center pb-0.5 border-b border-purple-100">
-                                            <span class="text-[8.5px] bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold px-1.5 py-0.5 rounded-full shadow-2xs flex items-center gap-1">
-                                                <i class="fa-solid fa-flask text-[9px]"></i> 2-SLOT LAB (1/2)
+                                html += `<div class="grid-cell p-0.5 flex flex-col transition-all group relative bg-gradient-to-b from-purple-600 via-indigo-600 to-purple-700 border-2 border-purple-400 rounded-t-2xl border-b-0 shadow-md z-10" ${dropAttrs}>
+                                    <div class="p-1.5 group/item relative hover:brightness-105 transition scheduled-item rounded-xl bg-white/95 border border-purple-200 shadow-sm h-full flex flex-col justify-between" ${dragAttrs}>
+                                        <div class="flex justify-between items-center pb-1 border-b border-purple-100">
+                                            <span class="text-[8.5px] bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black px-2 py-0.5 rounded-full shadow-2xs flex items-center gap-1">
+                                                <i class="fa-solid fa-flask text-amber-300 text-[9px]"></i> 2-SLOT LAB (1/2)
                                             </span>
-                                            <span class="font-extrabold text-[10px] text-purple-900">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</span>
+                                            <span class="font-black text-[10px] text-purple-950">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</span>
                                         </div>
-                                        <div class="text-[9.5px] font-extrabold text-gray-900 my-0.5 line-clamp-1">${sub.name} ${sub.spec ? `<span class="text-[8px] bg-blue-100 text-blue-700 px-1 rounded ml-1">${sub.spec}</span>` : ''}</div>
-                                        <div class="text-[8.5px] font-bold text-purple-800 uppercase tracking-tight flex justify-between items-center pt-0.5 border-t border-purple-50">
+                                        <div class="text-[9.5px] font-extrabold text-gray-900 my-0.5 line-clamp-1">${sub.name} ${sub.spec ? `<span class="text-[8px] bg-indigo-100 text-indigo-700 font-extrabold px-1.5 rounded ml-1">${sub.spec}</span>` : ''}</div>
+                                        <div class="text-[8.5px] font-bold text-purple-900 uppercase tracking-tight flex justify-between items-center pt-0.5 border-t border-purple-100/60">
                                             <span><i class="fa-solid fa-user-tie text-purple-600"></i> ${mode==='batch' ? sub.fac : (sub.room || 'N/A')}</span>
                                             ${mode==='batch' && sub.room ? `<span class="text-indigo-600 font-extrabold"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
                                         </div>
-                                        <div class="mt-0.5 text-[7.5px] font-extrabold text-purple-600 flex items-center justify-center gap-1 bg-purple-100/80 py-0.5 rounded">
-                                            <i class="fa-solid fa-arrows-up-down text-[7px]"></i> CONTINUOUS LAB SESSION
+                                        <div class="mt-0.5 text-[7.5px] font-black text-purple-700 flex items-center justify-center gap-1 bg-purple-100/90 py-0.5 rounded-b-md uppercase tracking-wider">
+                                            <i class="fa-solid fa-angles-down text-purple-500 animate-pulse"></i> CONTINUES IN NEXT SLOT
                                         </div>
                                         ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx}, '${sub.id}')" class="absolute top-1 right-1 p-0.5 text-red-400 opacity-0 group-hover/item:opacity-100 hover:text-red-600 transition z-10" title="Remove 2-Slot Lab"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
                                     </div>
@@ -1720,49 +1720,52 @@
                             } else if (labInfo && labInfo.isSecond) {
                                 const sub = labInfo.sub;
                                 const alloc = labInfo.alloc;
-                                html += `<div class="grid-cell p-0.5 flex flex-col transition-all group relative bg-gradient-to-b from-indigo-50/70 via-purple-50/80 to-purple-100/90 border-2 border-purple-400 rounded-b-xl border-t-0 shadow-md z-10 -mt-px" ${dropAttrs}>
-                                    <div class="p-1.5 group/item relative hover:brightness-95 transition scheduled-item rounded-lg bg-white/90 border border-purple-200 shadow-sm h-full flex flex-col justify-between">
-                                        <div class="flex justify-between items-center pb-0.5 border-b border-purple-100">
-                                            <span class="text-[8.5px] bg-purple-200 text-purple-800 font-extrabold px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                                                <i class="fa-solid fa-link text-purple-600 text-[9px]"></i> LAB (SLOT 2/2)
+                                html += `<div class="grid-cell p-0.5 flex flex-col transition-all group relative bg-gradient-to-b from-purple-700 via-indigo-700 to-purple-800 border-2 border-purple-400 rounded-b-2xl border-t-0 shadow-md z-10 -mt-px" ${dropAttrs}>
+                                    <div class="p-1.5 group/item relative hover:brightness-105 transition scheduled-item rounded-xl bg-purple-50/95 border border-purple-200 shadow-sm h-full flex flex-col justify-between">
+                                        <div class="flex justify-between items-center pb-0.5 border-b border-purple-200/60">
+                                            <span class="text-[8.5px] bg-purple-200 text-purple-900 font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                <i class="fa-solid fa-link text-purple-600 text-[9px]"></i> LAB CONTINUATION (2/2)
                                             </span>
-                                            <span class="font-extrabold text-[10px] text-purple-900">${sub.code}</span>
+                                            <span class="font-extrabold text-[9.5px] text-purple-950">${sub.code}</span>
                                         </div>
-                                        <div class="text-[9.5px] font-extrabold text-gray-900 my-0.5 line-clamp-1">${sub.name}</div>
-                                        <div class="text-[8.5px] font-bold text-purple-800 uppercase tracking-tight flex justify-between items-center pt-0.5 border-t border-purple-50">
+                                        <div class="text-[9px] font-bold text-gray-700 my-0.5 truncate flex items-center gap-1">
+                                            <i class="fa-solid fa-circle-dot text-indigo-500 text-[7px]"></i> ${sub.name}
+                                        </div>
+                                        <div class="text-[8px] font-extrabold text-purple-800 flex items-center justify-between pt-0.5 border-t border-purple-100">
                                             <span><i class="fa-solid fa-user-tie text-purple-600"></i> ${mode==='batch' ? sub.fac : (sub.room || 'N/A')}</span>
-                                            ${mode==='batch' && sub.room ? `<span class="text-indigo-600 font-extrabold"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                            ${mode==='batch' && sub.room ? `<span class="text-indigo-600 font-bold"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                        </div>
+                                        <div class="mt-0.5 text-[7.5px] font-extrabold text-emerald-700 flex items-center justify-center gap-1 bg-emerald-100/90 py-0.5 rounded-b-md uppercase tracking-wider">
+                                            <i class="fa-solid fa-circle-check text-emerald-600"></i> SESSION COMPLETED
                                         </div>
                                         ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx-1}, '${sub.id}')" class="absolute top-1 right-1 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 transition z-10" title="Remove 2-Slot Lab"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
                                     </div>
                                 </div>`;
                             } else {
-                                // Fetch all allocations for this slot using filter() to support concurrent specializations
                                 let allocs = [];
                                 if(mode === 'batch') allocs = app.schedule.filter(s => s.batch === entity && s.day === day && s.pIdx === sl.idx);
                                 else if (mode === 'room') allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.room) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx; });
                                 else allocs = app.schedule.filter(s => { const sub = app.subjects.find(x => x.id === s.sid); return sub && cleanStr(sub.fac) === cleanStr(entity) && s.day === day && s.pIdx === sl.idx && !ACTIVITY_TYPES.includes(sub.type); });
 
                                 if(allocs.length > 0) {
-                                    html += `<div class="grid-cell p-0.5 flex flex-col gap-0.5 transition-colors group relative overflow-y-auto c-scroll" ${dropAttrs}>`;
+                                    html += `<div class="grid-cell p-0.5 flex flex-col gap-1 transition-colors group relative overflow-y-auto c-scroll" ${dropAttrs}>`;
                                     allocs.forEach(alloc => {
                                         const sub = app.subjects.find(s => s.id === alloc.sid);
                                         if(!sub) return;
-                                        const isAct = ACTIVITY_TYPES.includes(sub.type);
                                         const color = stringColor(sub.name);
-                                        
                                         const dragAttrs = mode === 'batch' ? `draggable="true" ondragstart="event.dataTransfer.setData('reschedule', JSON.stringify({batch: '${alloc.batch}', day: ${day}, pIdx: ${sl.idx}, sid: '${alloc.sid}'})); event.stopPropagation();"` : '';
 
-                                        // Compact rendering if multiple
-                                        html += `<div class="p-1 group/item relative hover:brightness-95 transition scheduled-item shadow-sm rounded-sm shrink-0 border border-transparent hover:border-gray-300 bg-white" ${dragAttrs} style="border-left: 3px solid ${color}; min-height: 40px; display:flex; flex-direction:column; justify-content:center;">
-                                                <div class="flex justify-between items-start">
-                                                    <div class="font-bold text-[10px] text-gray-800 leading-tight">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</div>
-                                                    ${sub.spec ? `<div class="text-[8px] bg-blue-100 text-blue-700 px-1 rounded ml-1 truncate max-w-[40px]">${sub.spec}</div>` : ''}
+                                        html += `<div class="p-1.5 group/item relative hover:brightness-105 transition scheduled-item shadow-2xs hover:shadow-md rounded-xl shrink-0 border border-gray-200 bg-white flex flex-col justify-between" ${dragAttrs} style="border-left: 4px solid ${color}; min-height: 44px;">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="font-extrabold text-[10px] text-gray-900 leading-tight">${mode==='batch' ? sub.code : mode==='room' ? sub.batch : sub.batch}</span>
+                                                    ${sub.spec ? `<span class="text-[7.5px] bg-indigo-50 text-indigo-700 font-extrabold px-1.5 py-0.2 rounded-full border border-indigo-100 truncate max-w-[45px]">${sub.spec}</span>` : ''}
                                                 </div>
-                                                <div class="text-[9px] leading-tight text-gray-600 my-0.5 line-clamp-1">${sub.name}</div>
-                                                <div class="text-[8px] font-bold text-gray-400 uppercase tracking-tight">${mode==='batch' ? sub.fac : mode==='room' ? sub.fac : (sub.room || 'N/A')}</div>
-                                                ${mode==='batch' && sub.room ? `<div class="text-[8px] text-indigo-600 font-bold"><i class="fa-solid fa-door-open"></i> ${sub.room}</div>` : ''}
-                                                ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx}, '${sub.id}')" class="absolute top-0 right-0 p-1 text-red-400 opacity-0 group-hover/item:opacity-100 hover:text-red-600 transition z-10"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
+                                                <div class="text-[9.5px] font-extrabold text-gray-800 leading-tight my-0.5 line-clamp-1">${sub.name}</div>
+                                                <div class="flex justify-between items-center text-[8.5px] font-bold text-gray-500 pt-0.5 border-t border-gray-100">
+                                                    <span class="truncate max-w-[80px]"><i class="fa-solid fa-user-tie text-indigo-500"></i> ${mode==='batch' ? sub.fac : mode==='room' ? sub.fac : (sub.room || 'N/A')}</span>
+                                                    ${mode==='batch' && sub.room ? `<span class="text-indigo-600 font-extrabold shrink-0"><i class="fa-solid fa-door-open"></i> ${sub.room}</span>` : ''}
+                                                </div>
+                                                ${mode==='batch' ? `<button onclick="removeAlloc('${alloc.batch}', ${day}, ${sl.idx}, '${sub.id}')" class="absolute top-1 right-1 p-0.5 text-red-400 opacity-0 group-hover/item:opacity-100 hover:text-red-600 transition z-10"><i class="fa-solid fa-circle-xmark text-xs"></i></button>` : ''}
                                             </div>`;
                                     });
                                     html += `</div>`;
@@ -1974,6 +1977,37 @@
             const b = document.getElementById('selBatch').value; if(!b) return;
             if(confirm(`Clear schedule for ${b}?`)) { app.schedule = app.schedule.filter(s => s.batch !== b); save(); loadBatch(b); toast('Reset', `${b} cleared.`); }
         }
+
+        function backupData() {
+            try {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app, null, 2));
+                const dlAnchorElem = document.createElement('a');
+                dlAnchorElem.setAttribute("href", dataStr);
+                dlAnchorElem.setAttribute("download", `University_Scheduler_Backup_${new Date().toISOString().slice(0, 10)}.json`);
+                document.body.appendChild(dlAnchorElem);
+                dlAnchorElem.click();
+                dlAnchorElem.remove();
+                toast('Backup Downloaded', 'Timetable JSON backup saved successfully.');
+            } catch(err) {
+                console.error('Backup error:', err);
+                toast('Error', 'Failed to generate JSON backup.', true);
+            }
+        }
+
+        function resetAll() {
+            if (confirm("⚠️ FACTORY RESET WARNING ⚠️\n\nAre you sure you want to delete ALL timetable data, subjects, schedules, and custom settings?\nThis action cannot be undone!")) {
+                localStorage.removeItem('uniSchedDynV12');
+                localStorage.removeItem('uniSchedDynV11');
+                localStorage.removeItem('uniSchedDynV10');
+                localStorage.removeItem('uniSchedDyn');
+                localStorage.removeItem('uniSched');
+                localStorage.removeItem('universitySchedulerData');
+                location.reload();
+            }
+        }
+
+        window.backupData = backupData;
+        window.resetAll = resetAll;
 
         function restoreData(i) {
             const f = i.files[0];
