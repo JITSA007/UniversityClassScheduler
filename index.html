@@ -940,28 +940,44 @@
         }
 
         function completeSetup(e) {
-            e.preventDefault();
-            const pCount = parseInt(document.getElementById('suPCount').value) || 6;
-            const pDurs = [];
-            for(let i=1; i<=pCount; i++) pDurs.push(parseInt(document.getElementById(`suDur${i}`).value) || 60);
+            if (e) e.preventDefault();
+            try {
+                const pCount = Math.max(1, parseInt(document.getElementById('suPCount')?.value) || 6);
+                const pDurs = [];
+                for(let i=1; i<=pCount; i++) {
+                    const val = parseInt(document.getElementById(`suDur${i}`)?.value);
+                    pDurs.push(isNaN(val) || val < 5 ? 60 : val);
+                }
 
-            app.config = {
-                onboarded: true,
-                college: document.getElementById('suName').value || 'My University',
-                dept: document.getElementById('suDept').value || 'General Department',
-                start: document.getElementById('suStart').value,
-                pCount: pCount,
-                pDurs: pDurs,
-                hasLunch: document.getElementById('suHasLunch').checked,
-                lDur: parseInt(document.getElementById('suLunchDur').value) || 30,
-                lAfter: parseInt(document.getElementById('suLunchAfter').value) || 3,
-                labSlots: parseInt(document.getElementById('suLabSlots').value) || 2
-            };
-            save();
-            showMainApp();
-            refreshUI(); refreshSelectors(); renderDB(); setTab('academic');
-            switchView('data');
-            toast('Setup Complete', 'Custom timetable engine initialized!');
+                let startVal = document.getElementById('suStart')?.value || '09:00';
+                if (!startVal || !startVal.includes(':')) startVal = '09:00';
+
+                app.config = {
+                    onboarded: true,
+                    college: document.getElementById('suName')?.value?.trim() || 'My University',
+                    dept: document.getElementById('suDept')?.value?.trim() || 'General Department',
+                    start: startVal,
+                    pCount: pCount,
+                    pDurs: pDurs,
+                    hasLunch: document.getElementById('suHasLunch')?.checked ?? true,
+                    lDur: parseInt(document.getElementById('suLunchDur')?.value) || 30,
+                    lAfter: parseInt(document.getElementById('suLunchAfter')?.value) || 3,
+                    labSlots: parseInt(document.getElementById('suLabSlots')?.value) || 2,
+                    signatures: app.config?.signatures || []
+                };
+
+                showMainApp();
+                save();
+                refreshUI(); 
+                refreshSelectors(); 
+                renderDB(); 
+                setTab('academic');
+                switchView('data');
+                toast('Setup Complete', 'Custom timetable engine initialized!');
+            } catch (err) {
+                console.error('Error in completeSetup:', err);
+                showMainApp();
+            }
         }
 
         // --- CONFIG MODAL LOGIC ---
@@ -1034,11 +1050,14 @@
         };
 
         function getEndTimeStr() {
-            if(!app.config.pDurs) return '';
+            if(!app.config || !app.config.pDurs) return '';
             let totalMins = app.config.pDurs.reduce((sum, val) => sum + val, 0);
-            if(app.config.hasLunch) totalMins += app.config.lDur;
+            if(app.config.hasLunch) totalMins += (app.config.lDur || 30);
             
-            const [sh, sm] = app.config.start.split(':').map(Number);
+            const startVal = (app.config && app.config.start && String(app.config.start).includes(':')) ? String(app.config.start) : '09:00';
+            const parts = startVal.split(':');
+            const sh = parseInt(parts[0]) || 9;
+            const sm = parseInt(parts[1]) || 0;
             let endMins = (sh * 60) + sm + totalMins;
             
             let hh = Math.floor(endMins / 60); let mm = endMins % 60;
@@ -1048,16 +1067,24 @@
         }
 
         function refreshUI() { 
-            document.getElementById('navCollegeName').innerText = app.config.college; 
-            document.getElementById('navDeptName').innerText = app.config.dept || '';
+            if (!app.config) return;
+            const navCollege = document.getElementById('navCollegeName');
+            const navDept = document.getElementById('navDeptName');
+            if (navCollege) navCollege.innerText = app.config.college || 'My University'; 
+            if (navDept) navDept.innerText = app.config.dept || '';
             
-            const [sh, sm] = app.config.start.split(':').map(Number);
+            const startVal = (app.config.start && String(app.config.start).includes(':')) ? String(app.config.start) : '09:00';
+            const parts = startVal.split(':');
+            const sh = parseInt(parts[0]) || 9;
+            const sm = parseInt(parts[1]) || 0;
+            
             let s_hh = sh, s_ap = 'AM';
             if(s_hh >= 12) { s_ap = 'PM'; if(s_hh > 12) s_hh -= 12; }
             if(s_hh === 0) s_hh = 12;
             const startStr = `${s_hh}:${sm.toString().padStart(2,'0')} ${s_ap}`;
             
-            document.getElementById('navTimings').innerText = `${startStr} to ${getEndTimeStr()}`;
+            const navTimings = document.getElementById('navTimings');
+            if (navTimings) navTimings.innerText = `${startStr} to ${getEndTimeStr()}`;
         }
 
         function setTab(mode) {
@@ -1088,7 +1115,10 @@
         // --- DYNAMIC TIME ENGINE ---
         function getSlots() {
             const slots = [];
-            const [sh, sm] = app.config.start.split(':').map(Number);
+            const startVal = (app.config && app.config.start && String(app.config.start).includes(':')) ? String(app.config.start) : '09:00';
+            const parts = startVal.split(':');
+            const sh = parseInt(parts[0]) || 9;
+            const sm = parseInt(parts[1]) || 0;
             let cm = sh * 60 + sm;
             
             const fmt = (mins) => {
@@ -1953,11 +1983,19 @@
                 try {
                     const parsed = JSON.parse(e.target.result);
                     const normalized = normalizeAppData(parsed);
-                    if (normalized && (normalized.subjects.length > 0 || normalized.config.college)) {
+                    if (normalized) {
                         app = normalized;
+                        app.config.onboarded = true;
+                        
+                        showMainApp();
                         save();
-                        toast('Success', 'Backup restored & migrated successfully! Reloading...');
-                        setTimeout(() => location.reload(), 400);
+                        refreshUI();
+                        refreshSelectors();
+                        renderDB();
+                        setTab('academic');
+                        if (app.subjects.length > 0) switchView('scheduler'); else switchView('data');
+                        
+                        toast('Success', 'Backup restored & migrated successfully!');
                     } else {
                         toast('Error', 'Restored JSON file contains no valid timetable data.', true);
                     }
