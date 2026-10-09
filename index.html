@@ -177,6 +177,11 @@
                     Start Scheduling <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </form>
+            <div class="mt-4 pt-3 border-t border-gray-200/80 text-center">
+                <button type="button" onclick="document.getElementById('restoreFile').click()" class="w-full py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold rounded-xl border border-indigo-200/80 transition flex items-center justify-center gap-2 text-xs">
+                    <i class="fa-solid fa-file-import text-indigo-600"></i> Have a Backup File? Restore JSON Data
+                </button>
+            </div>
         </div>
     </div>
 
@@ -737,39 +742,140 @@
         };
         let editId = null;
 
-        window.onload = () => {
-            const saved = localStorage.getItem('uniSchedDynV12');
-            if(saved) {
-                app = JSON.parse(saved);
-                if (!app.faculties) app.faculties = {};
-                
-                // MIGRATION: Convert old generic duration to the new array system smoothly
-                if (typeof app.config.pDur === 'number') {
-                    app.config.pDurs = Array(app.config.pCount || 6).fill(app.config.pDur);
-                    delete app.config.pDur; 
+        function normalizeAppData(raw) {
+            if (!raw) return null;
+
+            let normalized = {
+                config: {
+                    onboarded: true,
+                    college: '',
+                    dept: '',
+                    start: '09:00',
+                    pCount: 6,
+                    pDurs: [60, 60, 60, 60, 60, 60],
+                    labSlots: 2,
+                    hasLunch: true,
+                    lDur: 30,
+                    lAfter: 3,
+                    signatures: []
+                },
+                subjects: [],
+                schedule: [],
+                faculties: {}
+            };
+
+            let rawConfig = null;
+            let rawSubjects = [];
+            let rawSchedule = [];
+            let rawFaculties = {};
+
+            if (Array.isArray(raw)) {
+                rawSubjects = raw;
+            } else if (typeof raw === 'object' && raw !== null) {
+                rawConfig = raw.config || raw.settings || null;
+                rawSubjects = raw.subjects || raw.data || raw.subjectList || [];
+                rawSchedule = raw.schedule || raw.timetable || raw.allocations || [];
+                rawFaculties = raw.faculties || raw.facultyCategories || {};
+            }
+
+            if (rawConfig && typeof rawConfig === 'object') {
+                normalized.config = { ...normalized.config, ...rawConfig };
+            }
+
+            if (Array.isArray(rawSubjects)) {
+                normalized.subjects = rawSubjects;
+            }
+
+            if (Array.isArray(rawSchedule)) {
+                normalized.schedule = rawSchedule;
+            }
+
+            if (rawFaculties && typeof rawFaculties === 'object') {
+                normalized.faculties = rawFaculties;
+            }
+
+            if (normalized.subjects.length > 0) {
+                normalized.config.onboarded = true;
+            }
+
+            const pCount = Math.max(1, parseInt(normalized.config.pCount) || 6);
+            normalized.config.pCount = pCount;
+
+            if (typeof normalized.config.pDur === 'number') {
+                normalized.config.pDurs = Array(pCount).fill(normalized.config.pDur);
+                delete normalized.config.pDur;
+            }
+
+            if (!Array.isArray(normalized.config.pDurs) || normalized.config.pDurs.length === 0) {
+                normalized.config.pDurs = Array(pCount).fill(60);
+            } else {
+                while (normalized.config.pDurs.length < pCount) {
+                    normalized.config.pDurs.push(60);
                 }
+            }
 
-                // MIGRATION / REPAIR: Ensure all subjects have a spec field and standardize Labs & Faculty Categories
-                app.subjects.forEach(s => {
-                    s.spec = cleanStr(s.spec) || '';
-                    if (s.type === 'Lab (2 Slots)' || s.type === 'Lab (1 Slot)') s.type = 'Lab';
-                    const f = cleanStr(s.fac);
-                    if (f && f !== 'Staff' && f !== 'TBA') {
-                        if (!app.faculties[f]) {
-                            app.faculties[f] = s.facCat || 'OnRoll';
-                        }
-                        s.facCat = app.faculties[f];
-                    }
-                });
+            if (normalized.config.labSlots === undefined) normalized.config.labSlots = 2;
+            if (!Array.isArray(normalized.config.signatures)) normalized.config.signatures = [];
+            if (!normalized.faculties || typeof normalized.faculties !== 'object') normalized.faculties = {};
+
+            normalized.subjects.forEach((s, idx) => {
+                if (!s.id) s.id = 'sub_' + Math.random().toString(36).substr(2, 9) + '_' + idx;
+                s.code = cleanStr(s.code) || ('SUB-' + (idx + 1));
+                s.name = cleanStr(s.name) || s.code;
+                s.batch = cleanStr(s.batch) || 'BATCH-1';
+                s.fac = cleanStr(s.fac) || 'Staff';
+                s.room = cleanStr(s.room) || '';
+                s.spec = cleanStr(s.spec) || '';
+                s.hrs = parseInt(s.hrs) || 1;
                 
-                // Ensure legacy saves default to 2 slots for labs
-                if(app.config.labSlots === undefined) app.config.labSlots = 2; 
+                if (s.type === 'Lab (2 Slots)' || s.type === 'Lab (1 Slot)') s.type = 'Lab';
+                if (!s.type) s.type = 'Lecture';
 
-                if(app.config.onboarded) {
-                    showMainApp();
-                    refreshUI(); refreshSelectors(); renderDB(); setTab('academic');
-                    if(app.subjects.length > 0) switchView('scheduler'); else switchView('data');
+                const f = cleanStr(s.fac);
+                if (f && f !== 'Staff' && f !== 'TBA') {
+                    if (!normalized.faculties[f]) {
+                        normalized.faculties[f] = s.facCat || 'OnRoll';
+                    }
+                    s.facCat = normalized.faculties[f];
                 } else {
+                    s.facCat = s.facCat || 'OnRoll';
+                }
+            });
+
+            return normalized;
+        }
+
+        window.onload = () => {
+            let saved = localStorage.getItem('uniSchedDynV12');
+            
+            if (!saved) {
+                const legacyKeys = ['uniSchedDynV11', 'uniSchedDynV10', 'uniSchedDyn', 'uniSched', 'universitySchedulerData'];
+                for (const key of legacyKeys) {
+                    const legacyData = localStorage.getItem(key);
+                    if (legacyData) {
+                        saved = legacyData;
+                        console.log('Migrated data from legacy storage key:', key);
+                        break;
+                    }
+                }
+            }
+
+            if(saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    app = normalizeAppData(parsed);
+                    save();
+
+                    if(app.config.onboarded) {
+                        showMainApp();
+                        refreshUI(); refreshSelectors(); renderDB(); setTab('academic');
+                        if(app.subjects.length > 0) switchView('scheduler'); else switchView('data');
+                    } else {
+                        document.getElementById('setup-root').classList.remove('hidden');
+                        renderSetupPeriods();
+                    }
+                } catch(err) {
+                    console.error('Error loading stored app data:', err);
                     document.getElementById('setup-root').classList.remove('hidden');
                     renderSetupPeriods();
                 }
@@ -1839,9 +1945,29 @@
             if(confirm(`Clear schedule for ${b}?`)) { app.schedule = app.schedule.filter(s => s.batch !== b); save(); loadBatch(b); toast('Reset', `${b} cleared.`); }
         }
 
-        function backupData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(app)], {type: 'application/json'})); a.download = `Scheduler_Backup.json`; a.click(); }
-        function restoreData(i) { const f = i.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { app = JSON.parse(e.target.result); save(); location.reload(); } catch(e) { toast('Error', 'Invalid File', true); } }; r.readAsText(f); }
-        function resetAll() { if(confirm("⚠️ FACTORY RESET WARNING ⚠️\nDelete ALL data?")) { localStorage.removeItem('uniSchedDynV12'); location.reload(); } }
+        function restoreData(i) {
+            const f = i.files[0];
+            if(!f) return;
+            const r = new FileReader();
+            r.onload = e => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    const normalized = normalizeAppData(parsed);
+                    if (normalized && (normalized.subjects.length > 0 || normalized.config.college)) {
+                        app = normalized;
+                        save();
+                        toast('Success', 'Backup restored & migrated successfully! Reloading...');
+                        setTimeout(() => location.reload(), 400);
+                    } else {
+                        toast('Error', 'Restored JSON file contains no valid timetable data.', true);
+                    }
+                } catch(err) {
+                    console.error('Restore error:', err);
+                    toast('Error', 'Invalid or corrupted JSON backup file.', true);
+                }
+            };
+            r.readAsText(f);
+        }
 
         function exportPDF() {
             if (app.schedule.length === 0) return toast('Warning', 'Schedule is empty.', true);
